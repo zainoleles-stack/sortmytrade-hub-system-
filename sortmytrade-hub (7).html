@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SortMyTrade — System Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0F2A4A;--navy-mid:#1a3a60;--navy-light:#254d7a;--green:#1a7a3c;--green-light:#22a050;--green-dim:#143d20;--accent:#f0a500;--white:#f4f7fb;--text:#dde5f0;--text-dim:#8a9bb5;--border:rgba(255,255,255,0.08);--card:rgba(255,255,255,0.04);--card-hover:rgba(255,255,255,0.07);--red:#c0392b;--orange:#e67e22;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;font-size:14px;}
+.header{background:linear-gradient(135deg,#0a1f38 0%,var(--navy) 60%,#0d2540 100%);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--white);letter-spacing:-0.5px;}
+.logo span{color:var(--green-light);}
+.header-meta{font-size:11px;color:var(--text-dim);text-align:right;line-height:1.6;}
+.phase-badge{display:inline-block;background:var(--green-dim);color:var(--green-light);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid var(--green);text-transform:uppercase;letter-spacing:0.5px;}
+.tabs-bar{background:rgba(0,0,0,0.2);border-bottom:1px solid var(--border);display:flex;gap:2px;padding:0 16px;overflow-x:auto;scrollbar-width:none;}
+.tabs-bar::-webkit-scrollbar{display:none;}
+.tab-btn{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:12px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all 0.2s;letter-spacing:0.3px;text-transform:uppercase;}
+.tab-btn:hover{color:var(--white);}
+.tab-btn.active{color:var(--green-light);border-bottom-color:var(--green-light);}
+.tab-badge{background:var(--green);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:5px;vertical-align:middle;display:none;}
+.tab-badge.show{display:inline-block;}
+.content{padding:24px;max-width:1200px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-bottom:14px;}
+label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.4px;}
+input,textarea,select{width:100%;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;margin-bottom:12px;}
+input:focus,textarea:focus,select:focus{border-color:var(--green-light);}
+select option{background:var(--navy);color:var(--white);}
+textarea{resize:vertical;min-height:80px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:all 0.2s;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-primary:hover{background:var(--green-light);transform:translateY(-1px);}
+.btn-secondary{background:var(--navy-mid);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--navy-light);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#e74c3c;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+/* AI */
+.ai-json-box{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:12px;color:#7ec8a0;white-space:pre-wrap;overflow-x:auto;margin-bottom:12px;display:none;}
+.add-crm-banner{background:linear-gradient(135deg,var(--green-dim),#1e5c32);border:1px solid var(--green);border-radius:10px;padding:14px 18px;align-items:center;justify-content:space-between;margin-bottom:12px;display:none;}
+.add-crm-banner .banner-text{font-size:13px;color:#a8e6bf;}
+.add-crm-banner .banner-text strong{color:#fff;}
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--text-dim);font-size:13px;padding:8px 0;}
+.dot-pulse{display:flex;gap:4px;}
+.dot-pulse span{width:6px;height:6px;background:var(--green-light);border-radius:50%;animation:pulse 1.2s infinite;}
+.dot-pulse span:nth-child(2){animation-delay:0.2s;}
+.dot-pulse span:nth-child(3){animation-delay:0.4s;}
+@keyframes pulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.grade-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;}
+.grade-A{background:#143d20;color:#4ade80;border:1px solid #22c55e;}
+.grade-B{background:#3d2e00;color:#fbbf24;border:1px solid #f59e0b;}
+.grade-C{background:#2d0d0d;color:#f87171;border:1px solid #ef4444;}
+/* CRM */
+.crm-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+.crm-stats{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.stat-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text-dim);}
+.stat-chip strong{color:var(--white);font-size:18px;display:block;line-height:1.2;}
+.leads-table{width:100%;border-collapse:collapse;}
+.leads-table th{text-align:left;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);padding:8px 10px;border-bottom:1px solid var(--border);}
+.leads-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;vertical-align:middle;}
+.leads-table tr:hover td{background:var(--card-hover);}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;}
+.status-new{background:#143d20;color:#4ade80;}
+.status-contacted{background:#0f2d4a;color:#60a5fa;}
+.status-quoted{background:#2d2000;color:#fbbf24;}
+.status-booked{background:#1e3a1e;color:#86efac;}
+.status-lost{background:#2d0d0d;color:#f87171;}
+.crm-add-form{background:rgba(26,122,60,0.08);border:1px solid rgba(26,122,60,0.3);border-radius:12px;padding:20px;margin-bottom:20px;display:none;}
+.crm-add-form.show{display:block;animation:slideDown 0.25s ease;}
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.pricing-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.pricing-item .trade-name{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--white);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.3px;}
+.pricing-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;color:var(--text-dim);}
+.pricing-row span:last-child{color:var(--accent);font-weight:600;}
+/* CALC */
+.calc-result{background:rgba(26,122,60,0.1);border:1px solid var(--green);border-radius:10px;padding:16px;margin-top:12px;}
+.calc-result .result-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.calc-result .result-row:last-child{border:none;font-weight:700;color:var(--green-light);font-size:15px;}
+/* POSTS */
+.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;}
+.post-num{font-family:'Syne',sans-serif;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.post-type{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;text-transform:uppercase;font-weight:600;margin-bottom:8px;}
+.post-type.trust{background:#0f2d4a;color:#60a5fa;}
+.post-type.social-proof{background:#143d20;color:#4ade80;}
+.post-type.lead-gen{background:#3d2e00;color:#fbbf24;}
+.post-type.edu{background:#1a0e3d;color:#c4b5fd;}
+.post-type.b2b{background:#2d0a30;color:#e879f9;border:1px solid rgba(232,121,249,0.3);}
+.post-body{font-size:12px;line-height:1.6;color:var(--text);}
+.post-copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--text-dim);cursor:pointer;transition:all 0.2s;}
+.post-copy-btn:hover{background:var(--green-dim);color:var(--green-light);}
+/* TRADERS */
+.trader-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.trader-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.trader-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);}
+.trader-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+.status-live{background:var(--green-dim);color:var(--green-light);border:1px solid var(--green);}
+.status-active{background:#0f2d4a;color:#60a5fa;border:1px solid #3b82f6;}
+.trader-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.tag{font-size:10px;padding:2px 8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:20px;color:var(--text-dim);}
+.trader-detail{font-size:12px;color:var(--text-dim);line-height:1.8;}
+.trader-detail strong{color:var(--text);}
+.gap-card{background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.3);border-radius:12px;padding:18px;}
+.gap-card .trader-name{color:var(--text-dim);}
+/* PIPELINE */
+.pipeline-cols{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;min-height:400px;}
+.pipeline-col{background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.pipeline-col-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.pipeline-card{background:var(--card-hover);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;font-size:11px;cursor:pointer;transition:all 0.2s;}
+.pipeline-card:hover{border-color:var(--green);transform:translateY(-1px);}
+.pipeline-card .pc-name{font-weight:600;color:var(--white);margin-bottom:3px;}
+.pipeline-card .pc-trade{color:var(--text-dim);}
+/* STRATEGY */
+.channel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:28px;}
+.channel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.2s,transform 0.2s;}
+.channel-card:hover{border-color:rgba(34,160,80,0.4);transform:translateY(-2px);}
+.channel-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.channel-icon{font-size:22px;width:42px;height:42px;background:rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.channel-meta{flex:1;}
+.channel-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px;}
+.channel-sub{font-size:11px;color:var(--text-dim);}
+.channel-difficulty{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap;}
+.diff-easy{background:#143d20;color:#4ade80;border:1px solid #22c55e;}
+.diff-medium{background:#3d2e00;color:#fbbf24;border:1px solid #f59e0b;}
+.diff-hard{background:#2d0d0d;color:#f87171;border:1px solid #ef4444;}
+.channel-body{padding:14px 18px;}
+.channel-desc{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:12px;}
+.script-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.script-box{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.65;color:var(--text);}
+.script-copy{background:var(--navy-mid);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:10px;color:var(--text-dim);cursor:pointer;transition:0.2s;font-family:'Syne',sans-serif;font-weight:600;}
+.script-copy:hover{background:var(--green-dim);color:var(--green-light);}
+.channel-stats{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ch-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text-dim);}
+.ch-stat strong{color:var(--accent);}
+/* TRACKER */
+.tracker-phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px;}
+.tracker-phase{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.phase-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+.phase-label.p1{color:#60a5fa;}
+.phase-label.p2{color:var(--accent);}
+.phase-label.p3{color:var(--green-light);}
+.phase-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--white);margin-bottom:6px;}
+.phase-days{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.tracker-progress{background:rgba(0,0,0,0.3);border-radius:4px;height:4px;margin-bottom:8px;overflow:hidden;}
+.tracker-progress-bar{height:100%;border-radius:4px;transition:width 0.4s ease;}
+.pb-p1{background:#60a5fa;}
+.pb-p2{background:var(--accent);}
+.pb-p3{background:var(--green-light);}
+.tracker-task{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;}
+.tracker-task:last-child{border-bottom:none;}
+.task-check{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.task-check.done{background:var(--green);border-color:var(--green);}
+.task-check.done::after{content:'checkmark';font-size:10px;color:#fff;font-weight:700;content:'✓';}
+.task-text{font-size:12px;color:var(--text);line-height:1.5;}
+.task-text.done{color:var(--text-dim);text-decoration:line-through;}
+/* B2B TIERS */
+.b2b-tiers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.tier-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;transition:border-color 0.2s;}
+.tier-card:hover{border-color:rgba(34,160,80,0.4);}
+.tier-card.featured{border-color:var(--accent);}
+.tier-badge{position:absolute;top:-1px;right:14px;background:var(--accent);color:var(--navy);font-family:'Syne',sans-serif;font-size:9px;font-weight:800;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;}
+.tier-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.tier-price{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--white);line-height:1;margin-bottom:2px;}
+.tier-price span{font-size:13px;color:var(--text-dim);font-weight:400;}
+.tier-target{font-size:11px;color:var(--text-dim);margin-bottom:14px;}
+.tier-feature{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--text-dim);margin-bottom:7px;line-height:1.4;}
+.tier-feature::before{content:'→';color:var(--green-light);flex-shrink:0;font-size:11px;margin-top:1px;}
+.tier-leads{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--green-light);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+/* REVENUE TABLE */
+.rev-table{width:100%;border-collapse:collapse;}
+.rev-table th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-dim);padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;}
+.rev-table th:first-child{text-align:left;}
+.rev-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:var(--text);text-align:right;}
+.rev-table td:first-child{text-align:left;color:var(--white);font-weight:500;}
+.rev-table tr:hover td{background:var(--card-hover);}
+.rev-table tr.target-row td{color:var(--green-light);font-weight:700;font-family:'Syne',sans-serif;border-top:1px solid var(--green);border-bottom:1px solid var(--green);background:rgba(26,122,60,0.08);}
+.rev-table tr.total-row td{color:var(--accent);font-weight:700;font-family:'Syne',sans-serif;border-top:1px solid var(--border);}
+/* NOTES */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.note-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.note-avatar{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-dim);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.note-avatar-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nd-naval{background:#60a5fa;}
+.nd-jeff{background:var(--accent);}
+.note-item{border-left:2px solid var(--border);padding:8px 0 8px 14px;margin-bottom:14px;}
+.note-item:last-child{margin-bottom:0;}
+.note-item.naval{border-left-color:rgba(96,165,250,0.5);}
+.note-item.jeff{border-left-color:rgba(240,165,0,0.5);}
+.note-quote{font-size:13px;color:var(--white);line-height:1.6;margin-bottom:6px;font-style:italic;}
+.note-apply{font-size:11px;color:var(--green-light);line-height:1.5;}
+/* SHARED */
+.section-divider{height:1px;background:var(--border);margin:28px 0;}
+.section-header{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;}
+.section-sub{font-size:12px;color:var(--text-dim);margin-bottom:20px;}
+.empty-state{text-align:center;padding:40px;color:var(--text-dim);font-size:13px;}
+.empty-state .icon{font-size:32px;margin-bottom:8px;}
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--navy-mid);border:1px solid var(--green);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--white);animation:slideUp 0.3s ease,fadeOut 0.3s ease 2.7s forwards;max-width:280px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(10px)}}
+.dm-box{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;color:var(--text);margin-top:8px;position:relative;}
+.dm-copy-btn{position:absolute;top:8px;right:8px;background:var(--navy-mid);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--text-dim);cursor:pointer;transition:0.2s;}
+.dm-copy-btn:hover{background:var(--green-dim);color:var(--green-light);}
+.info-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.info-chip{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text-dim);}
+.info-chip strong{color:var(--text);}
+@media(max-width:900px){.tracker-phases,.notes-grid{grid-template-columns:1fr}.b2b-tiers{grid-template-columns:1fr 1fr}.channel-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}.pipeline-cols{grid-template-columns:1fr 1fr}.content{padding:16px}.b2b-tiers{grid-template-columns:1fr}}
+
+/* LEAD SCOUT */
+.scout-keyword-tag{display:inline-flex;align-items:center;gap:6px;background:var(--navy-mid);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text);margin:3px;}
+.scout-keyword-tag button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:0;line-height:1;}
+.scout-keyword-tag button:hover{color:var(--red);}
+.scout-group-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px;}
+.scout-group-card:hover{border-color:rgba(34,160,80,0.3);}
+.scout-group-name{font-size:13px;font-weight:600;color:var(--white);}
+.scout-group-meta{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.scout-group-actions{display:flex;gap:8px;flex-shrink:0;}
+.scout-link-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;border:none;text-decoration:none;}
+.scout-link-btn.fb{background:#1a3a60;color:#60a5fa;}
+.scout-link-btn.fb:hover{background:#254d7a;}
+.scout-link-btn.nd{background:#1e3d1e;color:#4ade80;}
+.scout-link-btn.nd:hover{background:#1a5c1a;}
+.reply-timer{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--green-light);}
+.reply-timer.warning{color:var(--accent);}
+.reply-timer.danger{color:var(--red);}
+.scout-lead-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.scout-lead-card.sc-new{border-left:3px solid var(--green-light);}
+.scout-lead-card.sc-replied{border-left:3px solid #60a5fa;}
+.scout-lead-card.sc-converted{border-left:3px solid var(--accent);}
+.scout-lead-card.sc-missed{border-left:3px solid var(--red);opacity:0.6;}
+.sl-source-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-bottom:8px;}
+.sl-fb{background:#0f2d4a;color:#60a5fa;}
+.sl-nd{background:#143d20;color:#4ade80;}
+.sl-wa{background:#1a3d1a;color:#86efac;}
+.sl-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.sl-text{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:10px;}
+.sl-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sl-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+.sl-s-new{background:#143d20;color:#4ade80;}
+.sl-s-replied{background:#0f2d4a;color:#60a5fa;}
+.sl-s-converted{background:#3d2e00;color:#fbbf24;}
+.sl-s-missed{background:#2d0d0d;color:#f87171;}
+.scout-speed-box{background:rgba(26,122,60,0.08);border:1px solid rgba(26,122,60,0.3);border-radius:10px;padding:16px;text-align:center;margin-bottom:16px;}
+.search-url-tip{font-size:11px;color:var(--text-dim);line-height:1.6;padding:10px 12px;background:rgba(0,0,0,0.2);border-radius:8px;margin-top:8px;}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:10px}
+/* B2B TRACKER */
+.b2b-contact-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;margin-bottom:8px;transition:border-color 0.2s;}
+.b2b-contact-card:hover{border-color:rgba(34,160,80,0.3);}
+.b2b-contact-card.needs-followup{border-color:rgba(240,165,0,0.4);}
+.b2b-contact-card.is-retainer{border-color:var(--green);}
+.b2b-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.b2b-meta{font-size:11px;color:var(--text-dim);}
+.b2b-notes{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:2px;}
+.b2b-stage-pill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:0.3px;border:none;}
+.b2b-stage-pill:hover{opacity:0.8;}
+.sp-identified{background:rgba(255,255,255,0.08);color:var(--text-dim);}
+.sp-messaged{background:#0f2d4a;color:#60a5fa;}
+.sp-replied{background:#3d2e00;color:#fbbf24;}
+.sp-call-booked{background:#143d20;color:#4ade80;}
+.sp-trial-agreed{background:#1a3a60;color:#93c5fd;}
+.sp-retainer{background:var(--green-dim);color:var(--green-light);border:1px solid var(--green)!important;}
+.b2b-del-btn{background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:0 4px;transition:color 0.2s;}
+.b2b-del-btn:hover{color:var(--red);}
+.followup-tag{display:inline-block;background:rgba(240,165,0,0.15);color:var(--accent);font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:6px;text-transform:uppercase;}
+.active-filter{background:var(--green-dim)!important;color:var(--green-light)!important;border-color:var(--green)!important;}
+.b2b-pipe-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 6px;text-align:center;}
+.b2b-pipe-label{font-size:10px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;}
+.b2b-pipe-num{font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--white);}
+.b2b-stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.b2b-stat-label{font-size:11px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;}
+.b2b-stat-num{font-size:26px;font-weight:800;font-family:'Syne',sans-serif;color:var(--white);}
+.b2b-stat-num.green{color:var(--green-light);}
+.b2b-stat-num.amber{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">Sort<span>My</span>Trade <span style="color:var(--text-dim);font-weight:400;font-size:13px;">// System Hub</span></div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">South Manchester & Cheshire · Premium Trades Marketplace</div>
+  </div>
+  <div class="header-meta">
+    <div><span class="phase-badge">Phase 2 Unlocked</span> &nbsp;8 traders onboarded</div>
+    <div style="margin-top:3px;">Target: <strong style="color:var(--accent)">£8,000/mo</strong> · Pay-per-lead + Subscriptions</div>
+  </div>
+</div>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('ai',this)">🤖 AI Lead Responder</button>
+  <button class="tab-btn" onclick="switchTab('crm',this)">CRM <span class="tab-badge" id="crm-badge">0</span></button>
+  <button class="tab-btn" onclick="switchTab('pricing',this)">💷 Pricing</button>
+  <button class="tab-btn" onclick="switchTab('margin',this)">📊 Margin Calc</button>
+  <button class="tab-btn" onclick="switchTab('posts',this)">📱 Posts</button>
+  <button class="tab-btn" onclick="switchTab('traders',this)">👷 Traders</button>
+  <button class="tab-btn" onclick="switchTab('pipeline',this)">🔁 Pipeline</button>
+  <button class="tab-btn" onclick="switchTab('strategy',this)">🎯 Strategy</button>
+  <button class="tab-btn" onclick="switchTab('b2b',this)">📞 B2B Outreach</button>
+  <button class="tab-btn" onclick="switchTab('scout',this)">🔍 Lead Scout</button>
+</div>
+
+<div class="content">
+
+<!-- AI LEAD RESPONDER -->
+<div class="tab-panel active" id="panel-ai">
+  <div class="grid-2" style="gap:20px;align-items:start;">
+    <div>
+      <div class="card">
+        <div class="card-title">📥 Paste Lead Message</div>
+        <label>Source</label>
+        <select id="ai-source"><option>Facebook DM</option><option>WhatsApp</option><option>Nextdoor</option><option>Website Form</option><option>Phone</option><option>Email</option></select>
+        <label>Lead Message / Details</label>
+        <textarea id="ai-input" rows="6" placeholder="Paste the lead message here..."></textarea>
+        <button class="btn btn-primary" onclick="runAIResponder()" id="ai-run-btn" style="width:100%;justify-content:center;">⚡ Classify & Generate Response</button>
+      </div>
+      <div id="ai-loading" style="display:none;" class="card">
+        <div class="ai-loading"><div class="dot-pulse"><span></span><span></span><span></span></div>Analysing lead...</div>
+      </div>
+    </div>
+    <div>
+      <div id="ai-output-panel" style="display:none;">
+        <div class="add-crm-banner" id="add-crm-banner">
+          <div class="banner-text">✅ <strong>Lead classified!</strong> Add to CRM with one click.</div>
+          <button class="btn btn-primary" onclick="addToCRM()">Add to CRM →</button>
+        </div>
+        <div class="card"><div class="card-title">Classification</div><div class="info-grid" id="classification-chips"></div><div id="ai-comment" style="font-size:13px;color:var(--text-dim);line-height:1.6;"></div></div>
+        <div class="card"><div class="card-title">💬 Suggested DM</div><div class="dm-box" id="ai-dm"><button class="dm-copy-btn" onclick="copyDM()">Copy</button><span id="dm-text"></span></div></div>
+        <div class="card"><div class="card-title">🎯 Closing Move</div><div id="ai-closing" style="font-size:13px;line-height:1.6;color:var(--text);"></div></div>
+        <button class="btn btn-secondary" onclick="toggleJSON()" style="font-size:11px;">{ } Raw JSON</button>
+        <div class="ai-json-box" id="ai-json"></div>
+      </div>
+      <div id="ai-placeholder" class="card empty-state"><div class="icon">🤖</div>Paste a lead message and click classify</div>
+    </div>
+  </div>
+</div>
+
+<!-- CRM -->
+<div class="tab-panel" id="panel-crm">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);">Lead CRM</div><div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Persisted locally · Syncs to Google Sheets</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="openGoogleSheet()">📊 Google Sheet</button><button class="btn btn-primary" onclick="toggleAddForm()">+ Add Lead</button></div>
+  </div>
+  <div class="crm-stats" id="crm-stats"></div>
+  <div class="crm-add-form" id="crm-add-form">
+    <div class="card-title" style="margin-bottom:16px;" id="crm-form-title">➕ Add New Lead</div>
+    <input type="hidden" id="crm-edit-id">
+    <div class="grid-3">
+      <div><label>Name</label><input type="text" id="crm-name" placeholder="Customer name"></div>
+      <div><label>Phone</label><input type="text" id="crm-phone" placeholder="07xxx xxxxxx"></div>
+      <div><label>Source</label><select id="crm-source-input"><option>Facebook DM</option><option>WhatsApp</option><option>Nextdoor</option><option>Website Form</option><option>Phone</option><option>Referral</option><option>Other</option></select></div>
+    </div>
+    <div class="grid-3">
+      <div><label>Trade</label><input type="text" id="crm-trade" placeholder="e.g. Removals"></div>
+      <div><label>Trader</label><select id="crm-trader"><option value="Unassigned">Unassigned</option><option>Yellow Removals</option><option>House of Dreams</option><option>One Arrow Electrical</option><option>Robert (Electrician)</option><option>Gardening Specialist</option><option>Joe (Man &amp; Van)</option><option>M &amp; N Waste Removals</option><option>Paul (Plumber)</option></select></div>
+      <div><label>Grade</label><select id="crm-grade"><option value="">Ungraded</option><option value="A">A — Hot</option><option value="B">B — Warm</option><option value="C">C — Cold</option></select></div>
+    </div>
+    <label>Job Details</label>
+    <textarea id="crm-details" rows="3" placeholder="Job description, location, dates..."></textarea>
+    <div class="grid-2">
+      <div><label>Status</label><select id="crm-status"><option value="new">New</option><option value="contacted">Contacted</option><option value="quoted">Quoted</option><option value="booked">Booked</option><option value="lost">Lost</option></select></div>
+      <div><label>Value (£)</label><input type="number" id="crm-value" placeholder="Estimated job value"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-primary" onclick="saveLead()">💾 Save Lead</button>
+      <button class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+      <button class="btn btn-danger" onclick="deleteCurrentLead()" id="crm-delete-btn" style="display:none;">🗑 Delete</button>
+    </div>
+  </div>
+  <div class="crm-controls">
+    <button class="btn btn-primary" onclick="getLeadsDB().then(l=>{localStorage.setItem('smt_leads',JSON.stringify(l));updateCRMBadge();renderLeads();showSyncStatus('✅ Synced from cloud');})" style="font-size:11px;">☁️ Sync</button>
+    <select id="filter-status" onchange="renderLeads()" style="width:auto;margin:0;"><option value="">All Statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="quoted">Quoted</option><option value="booked">Booked</option><option value="lost">Lost</option></select>
+    <select id="filter-trader" onchange="renderLeads()" style="width:auto;margin:0;"><option value="">All Traders</option><option>Yellow Removals</option><option>House of Dreams</option><option>One Arrow Electrical</option><option>Robert (Electrician)</option><option>Gardening Specialist</option><option>Joe (Man &amp; Van)</option><option>M &amp; N Waste Removals</option><option>Paul (Plumber)</option><option>Unassigned</option></select>
+    <select id="filter-grade" onchange="renderLeads()" style="width:auto;margin:0;"><option value="">All Grades</option><option value="A">A — Hot</option><option value="B">B — Warm</option><option value="C">C — Cold</option></select>
+    <button class="btn btn-secondary" onclick="exportCSV()" style="margin-left:auto;">⬇ Export CSV</button>
+  </div>
+  <div id="leads-container"><div class="empty-state"><div class="icon">📋</div>No leads yet.</div></div>
+</div>
+
+<!-- PRICING -->
+<div class="tab-panel" id="panel-pricing">
+  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;">Lead Pricing Guide</div>
+  <div style="font-size:12px;color:var(--text-dim);margin-bottom:20px;">Pay-per-lead rates · South Manchester & Cheshire</div>
+  <div class="pricing-grid">
+    <div class="pricing-item"><div class="trade-name">📦 Removals / Man &amp; Van</div><div class="pricing-row"><span>Studio/1-bed</span><span>£8–12</span></div><div class="pricing-row"><span>2-bed flat</span><span>£12–18</span></div><div class="pricing-row"><span>3-bed house</span><span>£18–25</span></div><div class="pricing-row"><span>4-bed+</span><span>£25–40</span></div><div class="pricing-row"><span>Man &amp; Van</span><span>£6–10</span></div><div class="pricing-row"><span>Office move</span><span>£30–60</span></div></div>
+    <div class="pricing-item"><div class="trade-name">⚡ Electrical</div><div class="pricing-row"><span>Consumer unit</span><span>£25–40</span></div><div class="pricing-row"><span>EICR</span><span>£20–30</span></div><div class="pricing-row"><span>Fault find</span><span>£15–20</span></div><div class="pricing-row"><span>New circuit</span><span>£20–30</span></div><div class="pricing-row"><span>Sockets/lights</span><span>£10–15</span></div><div class="pricing-row"><span>EV charger</span><span>£30–45</span></div></div>
+    <div class="pricing-item"><div class="trade-name">🔧 Plumbing</div><div class="pricing-row"><span>Emergency</span><span>£25–40</span></div><div class="pricing-row"><span>Bathroom fit</span><span>£40–70</span></div><div class="pricing-row"><span>Boiler service</span><span>£20–30</span></div><div class="pricing-row"><span>Leak repair</span><span>£15–25</span></div><div class="pricing-row"><span>Radiator</span><span>£12–18</span></div></div>
+    <div class="pricing-item"><div class="trade-name">🌿 Gardening</div><div class="pricing-row"><span>Regular maintenance</span><span>£8–14</span></div><div class="pricing-row"><span>One-off clearance</span><span>£12–20</span></div><div class="pricing-row"><span>Landscaping</span><span>£25–50</span></div><div class="pricing-row"><span>Jet washing</span><span>£8–14</span></div><div class="pricing-row"><span>Tree surgery</span><span>£20–35</span></div></div>
+    <div class="pricing-item"><div class="trade-name">🏠 Handyman</div><div class="pricing-row"><span>Small jobs (1-2hr)</span><span>£8–12</span></div><div class="pricing-row"><span>Half day</span><span>£14–20</span></div><div class="pricing-row"><span>Full day</span><span>£20–35</span></div><div class="pricing-row"><span>Painting &amp; decor</span><span>£15–25</span></div></div>
+    <div class="pricing-item"><div class="trade-name">🏗 Builder / Joiner</div><div class="pricing-row"><span>Kitchen fit</span><span>£50–90</span></div><div class="pricing-row"><span>Extension</span><span>£80–150</span></div><div class="pricing-row"><span>Loft conversion</span><span>£70–120</span></div><div class="pricing-row"><span>General build</span><span>£25–50</span></div></div>
+  </div>
+  <div class="section-divider"></div>
+  <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:14px;">Trader Subscriptions (Phase 2)</div>
+  <div class="grid-3">
+    <div class="pricing-item" style="border-color:var(--green);"><div class="trade-name" style="color:var(--green-light);">Starter</div><div style="font-size:22px;font-family:'Syne',sans-serif;font-weight:800;color:var(--white);margin:8px 0;">£99<span style="font-size:13px;color:var(--text-dim)">/mo</span></div><div class="pricing-row"><span>Leads/month</span><span>5</span></div><div class="pricing-row"><span>Profile listing</span><span>✓</span></div><div class="pricing-row"><span>WhatsApp notify</span><span>✓</span></div></div>
+    <div class="pricing-item" style="border-color:var(--accent);"><div class="trade-name" style="color:var(--accent);">Growth</div><div style="font-size:22px;font-family:'Syne',sans-serif;font-weight:800;color:var(--white);margin:8px 0;">£199<span style="font-size:13px;color:var(--text-dim)">/mo</span></div><div class="pricing-row"><span>Leads/month</span><span>12</span></div><div class="pricing-row"><span>Priority placement</span><span>✓</span></div><div class="pricing-row"><span>Review booster</span><span>✓</span></div></div>
+    <div class="pricing-item"><div class="trade-name">Pro</div><div style="font-size:22px;font-family:'Syne',sans-serif;font-weight:800;color:var(--white);margin:8px 0;">£349<span style="font-size:13px;color:var(--text-dim)">/mo</span></div><div class="pricing-row"><span>Unlimited leads</span><span>✓</span></div><div class="pricing-row"><span>Letting agent feed</span><span>✓</span></div><div class="pricing-row"><span>Dedicated account</span><span>✓</span></div></div>
+  </div>
+</div>
+
+<!-- MARGIN CALC -->
+<div class="tab-panel" id="panel-margin">
+  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:20px;">Margin Calculator</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Job Details</div>
+      <label>Job Value Quoted (£)</label><input type="number" id="calc-job-value" placeholder="e.g. 450" oninput="calcMargin()">
+      <label>Lead Cost to Trader (£)</label><input type="number" id="calc-lead-cost" placeholder="e.g. 20" oninput="calcMargin()">
+      <label>Commission (%)</label><input type="number" id="calc-commission" value="0" oninput="calcMargin()">
+      <label>Labour Cost (£)</label><input type="number" id="calc-labour" placeholder="optional" oninput="calcMargin()">
+      <label>Other Costs (£)</label><input type="number" id="calc-other" value="0" oninput="calcMargin()">
+    </div>
+    <div>
+      <div class="card"><div class="card-title">SMT Revenue</div><div class="calc-result"><div class="result-row"><span>Lead fee</span><span id="r-lead-fee">£0</span></div><div class="result-row"><span>Commission</span><span id="r-commission">£0</span></div><div class="result-row"><span><strong>Total SMT</strong></span><span id="r-smt-total">£0</span></div></div></div>
+      <div class="card"><div class="card-title">Trader Margin</div><div class="calc-result"><div class="result-row"><span>Job value</span><span id="r-job-val">£0</span></div><div class="result-row"><span>Lead cost</span><span id="r-lead-paid">-£0</span></div><div class="result-row"><span>Labour</span><span id="r-labour">-£0</span></div><div class="result-row"><span>Other</span><span id="r-other">-£0</span></div><div class="result-row"><span><strong>Net Profit</strong></span><span id="r-trader-profit">£0</span></div><div class="result-row"><span><strong>Margin %</strong></span><span id="r-trader-margin">0%</span></div></div></div>
+      <div class="card"><div class="card-title">Monthly Projections</div><label>Leads/Month</label><input type="number" id="calc-leads-pm" value="40" oninput="calcProjection()"><div class="calc-result"><div class="result-row"><span>Monthly lead revenue</span><span id="r-monthly-lead">£0</span></div><div class="result-row"><span>vs £8k target</span><span id="r-gap" style="color:var(--accent);">—</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- POSTS -->
+<div class="tab-panel" id="panel-posts">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);">Content Bank</div><div style="font-size:12px;color:var(--text-dim);">40 posts — B2C & B2B outreach</div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="filterPosts('')">All</button>
+      <button class="btn btn-secondary" onclick="filterPosts('trust')">Trust</button>
+      <button class="btn btn-secondary" onclick="filterPosts('social-proof')">Social Proof</button>
+      <button class="btn btn-secondary" onclick="filterPosts('lead-gen')">Lead Gen</button>
+      <button class="btn btn-secondary" onclick="filterPosts('edu')">Edu</button>
+      <button class="btn btn-secondary" style="border-color:rgba(232,121,249,0.4);color:#e879f9;" onclick="filterPosts('b2b')">B2B</button>
+    </div>
+  </div>
+  <div class="posts-grid" id="posts-grid"></div>
+</div>
+
+<!-- TRADERS -->
+<div class="tab-panel" id="panel-traders">
+  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;">Trader Roster</div>
+  <div style="font-size:12px;color:var(--text-dim);margin-bottom:20px;">8 active traders · Phase 2 reached</div>
+  <div class="grid-2">
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">Yellow Removals</div><span class="trader-status status-live">Live</span></div><div class="trader-tags"><span class="tag">Removals</span><span class="tag">Man &amp; Van</span></div><div class="trader-detail"><strong>Reviews:</strong> 6 × verified reviews<br><strong>Contact:</strong> Moise / WhatsApp<br><strong>Notes:</strong> First onboarded. Strong social proof.</div></div>
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">House of Dreams</div><span class="trader-status status-active">Active</span></div><div class="trader-tags"><span class="tag">Handyman</span><span class="tag">Gardening</span><span class="tag">Waste</span><span class="tag">Painting</span><span class="tag">Landscape</span></div><div class="trader-detail"><strong>Phone:</strong> 07310 241431<br><strong>Notes:</strong> Multi-service. Strong for bundled jobs.</div></div>
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">One Arrow Electrical Ltd</div><span class="trader-status status-active">Active</span></div><div class="trader-tags"><span class="tag">Electrical</span><span class="tag">NAPIT Accredited</span></div><div class="trader-detail"><strong>Email:</strong> onearrowelectrical@gmail.com<br><strong>Coverage:</strong> SK12 · Wilmslow · Poynton · Woodford · Bramhall</div></div>
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">Robert (Electrician)</div><span class="trader-status status-active">Active</span></div><div class="trader-tags"><span class="tag">Domestic Electrical</span><span class="tag">Emergency</span><span class="tag">EICR</span></div><div class="trader-detail"><strong>Area:</strong> Withington &amp; surrounds<br><strong>Notes:</strong> Emergency callouts, faultfinding, inspections.</div></div>
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">Gardening &amp; Maintenance</div><span class="trader-status status-active">Active</span></div><div class="trader-tags"><span class="tag">Gardening</span><span class="tag">Painting</span><span class="tag">Jet Washing</span></div><div class="trader-detail"><strong>Phone:</strong> 07707 978347<br><strong>Notes:</strong> Regular contracts &amp; seasonal work.</div></div>
+    <div class="trader-card"><div class="trader-header"><div class="trader-name">Joe (Man &amp; Van)</div><span class="trader-status status-active">Active</span></div><div class="trader-tags"><span class="tag">Man &amp; Van</span><span class="tag">Removals</span></div><div class="trader-detail"><strong>Phone:</strong> 07491 011978<br><strong>Notes:</strong> Smaller moves, students, overflow for Yellow Removals.</div></div>
+    <div class="trader-card">
+      <div class="trader-header">
+        <div class="trader-name">M &amp; N Waste Removals</div>
+        <span class="trader-status status-active">Active</span>
+      </div>
+      <div class="trader-tags">
+        <span class="tag">Waste Removal</span>
+        <span class="tag">Clearances</span>
+        <span class="tag">Rubbish Collection</span>
+        <span class="tag">Upper Tier Licensed</span>
+      </div>
+      <div class="trader-detail">
+        <strong>Partners:</strong> Nathan King &amp; Mark Morrison<br>
+        <strong>Licence:</strong> Upper tier carrier, broker &amp; dealer · CBDU573144<br>
+        <strong>Area:</strong> Manchester &amp; surrounds<br>
+        <strong>Notes:</strong> Environment Agency registered. Strong for landlord void clearances, bulky waste &amp; end-of-tenancy jobs.
+      </div>
+    </div>
+    <div class="trader-card">
+      <div class="trader-header">
+        <div class="trader-name">Paul — Plumber</div>
+        <span class="trader-status status-active">Active</span>
+      </div>
+      <div class="trader-tags">
+        <span class="tag">Plumbing</span>
+        <span class="tag">Bathrooms</span>
+        <span class="tag">Radiators</span>
+        <span class="tag">Leaks & Taps</span>
+        <span class="tag">Hot Water Systems</span>
+        <span class="tag">G3 Qualified</span>
+        <span class="tag">Water Regulations</span>
+      </div>
+      <div class="trader-detail">
+        <strong>Phone:</strong> 07388 365301<br>
+        <strong>Area:</strong> Leigh / Wigan · Manchester &amp; surrounds<br>
+        <strong>Qualifications:</strong> Water Regulations qualification · G3 Unvented Hot Water Systems<br>
+        <strong>Specialisms:</strong> Bathrooms, radiators, leaks, taps, outside taps, hot water systems, general maintenance<br>
+        <strong>Notes:</strong> Self-employed, transparent — not Gas Safe registered so no gas/boiler work. Strong for all non-gas plumbing. Good coverage across Greater Manchester.
+      </div>
+    </div>
+  </div>
+  <div class="section-divider"></div>
+  <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:14px;">Roster Gaps — Priority Recruitment</div>
+  <div class="grid-3">
+    <div class="gap-card"><div class="trader-header"><div class="trader-name">Plumber</div><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(192,57,43,0.3);color:#f87171;border:1px solid var(--red);">PRIORITY</span></div><div class="trader-detail">Covered by Paul (Plumber) — Leigh/Wigan/Manchester. Non-gas plumbing.</div></div>
+    <div class="gap-card"><div class="trader-header"><div class="trader-name">Builder / Joiner</div><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(230,126,34,0.3);color:#fbbf24;border:1px solid var(--orange);">Needed</span></div><div class="trader-detail">High-value jobs. Extensions, lofts, kitchen fits.</div></div>
+    <div class="gap-card"><div class="trader-header"><div class="trader-name">Roofer</div><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(230,126,34,0.3);color:#fbbf24;border:1px solid var(--orange);">Needed</span></div><div class="trader-detail">Seasonal demand. Repair, re-tile, guttering.</div></div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="tab-panel" id="panel-pipeline">
+  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);margin-bottom:20px;">Sales Pipeline</div>
+  <div class="pipeline-cols" id="pipeline-board"></div>
+</div>
+
+<!-- STRATEGY -->
+<div class="tab-panel" id="panel-strategy">
+
+  <div class="section-header">🏢 B2B Acquisition Channels</div>
+  <div class="section-sub">6 channels to land landlords, letting agents &amp; property managers as recurring clients</div>
+  <div class="channel-grid" id="channel-grid"></div>
+
+  <div class="section-divider"></div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px;">
+    <div><div class="section-header">📅 90-Day Activity Tracker</div><div class="section-sub">Click tasks to mark complete · Progress auto-saves</div></div>
+    <button class="btn btn-secondary" onclick="resetTracker()" style="font-size:11px;">↺ Reset All</button>
+  </div>
+  <div class="tracker-phases" id="tracker-phases"></div>
+
+  <div class="section-divider"></div>
+
+  <div class="section-header">💼 B2B Retainer Pricing</div>
+  <div class="section-sub">Landlord &amp; letting agent recurring packages · Predictable MRR on top of pay-per-lead</div>
+  <div class="b2b-tiers">
+    <div class="tier-card">
+      <div class="tier-name">Starter</div>
+      <div class="tier-price">£149<span>/mo</span></div>
+      <div class="tier-target">Solo landlord · 1–3 properties</div>
+      <div class="tier-feature">Up to 4 trade jobs per month</div>
+      <div class="tier-feature">WhatsApp coordination included</div>
+      <div class="tier-feature">Response within 4 hours</div>
+      <div class="tier-feature">Monthly job summary report</div>
+      <div class="tier-leads">Est. lead revenue: £40–80/mo</div>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-badge">Most Popular</div>
+      <div class="tier-name" style="color:var(--accent);">Landlord Pro</div>
+      <div class="tier-price">£299<span>/mo</span></div>
+      <div class="tier-target">Landlord · 4–10 properties</div>
+      <div class="tier-feature">Up to 10 trade jobs per month</div>
+      <div class="tier-feature">Priority 2-hour response</div>
+      <div class="tier-feature">Dedicated WhatsApp line</div>
+      <div class="tier-feature">Contractor invoice handling</div>
+      <div class="tier-feature">Quarterly maintenance review</div>
+      <div class="tier-leads">Est. lead revenue: £150–250/mo</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-name">Agent Partner</div>
+      <div class="tier-price">£499<span>/mo</span></div>
+      <div class="tier-target">Letting agency · 10–30 properties</div>
+      <div class="tier-feature">Unlimited trade job referrals</div>
+      <div class="tier-feature">Same-day response guarantee</div>
+      <div class="tier-feature">White-label job portal option</div>
+      <div class="tier-feature">Monthly spend &amp; job report</div>
+      <div class="tier-feature">Exclusive trader allocation</div>
+      <div class="tier-leads">Est. lead revenue: £300–600/mo</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-name">Agency Elite</div>
+      <div class="tier-price">£899<span>/mo</span></div>
+      <div class="tier-target">Multi-branch agency · 30+ properties</div>
+      <div class="tier-feature">Full property maintenance management</div>
+      <div class="tier-feature">Dedicated account manager</div>
+      <div class="tier-feature">Custom SLA agreements</div>
+      <div class="tier-feature">API / integration support</div>
+      <div class="tier-feature">Quarterly in-person review</div>
+      <div class="tier-leads">Est. lead revenue: £600–1,200/mo</div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="section-header">📈 Revenue Projection Table</div>
+  <div class="section-sub">B2B retainers + pay-per-lead pathway to £8k/mo</div>
+  <div class="card" style="overflow-x:auto;">
+    <table class="rev-table">
+      <thead><tr><th>Scenario</th><th>B2B Mix</th><th>Retainer MRR</th><th>PPL Leads</th><th>PPL Rev</th><th>Total MRR</th></tr></thead>
+      <tbody>
+        <tr><td>Month 1–2</td><td>None yet</td><td>£0</td><td>15</td><td>£300</td><td>£300</td></tr>
+        <tr><td>Month 3</td><td>2 × Starter</td><td>£298</td><td>25</td><td>£500</td><td>£798</td></tr>
+        <tr><td>Month 4–5</td><td>1 × Pro + 2 × Starter</td><td>£597</td><td>40</td><td>£800</td><td>£1,397</td></tr>
+        <tr><td>Month 6</td><td>1 × Agent + 2 × Pro</td><td>£1,097</td><td>60</td><td>£1,200</td><td>£2,297</td></tr>
+        <tr><td>Month 7–8</td><td>2 × Agent + 3 × Pro</td><td>£1,895</td><td>80</td><td>£1,600</td><td>£3,495</td></tr>
+        <tr><td>Month 9</td><td>1 × Elite + 2 × Agent + 3 × Pro</td><td>£2,794</td><td>100</td><td>£2,000</td><td>£4,794</td></tr>
+        <tr class="target-row"><td>🎯 Month 11–12 Target</td><td>1 × Elite + 3 × Agent + 5 × Pro</td><td>£4,392</td><td>180</td><td>£3,600</td><td>£7,992</td></tr>
+        <tr class="total-row"><td>🚀 Month 15+ Scale</td><td>2 × Elite + 5 × Agent + 8 × Pro</td><td>£7,990</td><td>250+</td><td>£5,000+</td><td>£12,990+</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">* PPL avg £20/lead · Trader subscriptions (Pricing tab) stack on top of these numbers</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="section-header">🧠 Founder Notes</div>
+  <div class="section-sub">Naval Ravikant &amp; Jeff Bezos principles applied to SortMyTrade</div>
+  <div class="notes-grid">
+    <div class="note-section">
+      <div class="note-avatar"><div class="note-avatar-dot nd-naval"></div>Naval Ravikant — Leverage &amp; Wealth</div>
+      <div class="note-item naval"><div class="note-quote">"Seek wealth, not money or status. Wealth is having assets that earn while you sleep."</div><div class="note-apply">→ Every B2B retainer signed is passive income. A landlord on £299/mo earns £3,588/yr with zero additional cold outreach. Stack retainers = build the asset.</div></div>
+      <div class="note-item naval"><div class="note-quote">"Specific knowledge can't be taught. If it can be taught, it can be automated."</div><div class="note-apply">→ Your knowledge of South Manchester postcodes, which traders to trust, and how to qualify a lead fast — that's your moat. No national directory has it.</div></div>
+      <div class="note-item naval"><div class="note-quote">"Don't try to be everything to everyone. Dominate a niche first."</div><div class="note-apply">→ Own Didsbury, Chorlton, Sale, Altrincham first. Be the undisputed local expert in 7 postcodes before expanding. Depth beats breadth at this stage.</div></div>
+      <div class="note-item naval"><div class="note-quote">"Productise yourself. Build something that scales without your time."</div><div class="note-apply">→ This hub IS the productisation. Automate lead triage, automate WhatsApp routing, build retainer packages that don't require daily calls to sustain.</div></div>
+      <div class="note-item naval"><div class="note-quote">"Play long-term games with long-term people."</div><div class="note-apply">→ Every letting agent relationship is a long-term game. Don't pitch hard — deliver one great job, then let the retainer conversation happen naturally from trust.</div></div>
+    </div>
+    <div class="note-section">
+      <div class="note-avatar"><div class="note-avatar-dot nd-jeff"></div>Jeff Bezos — Customer Obsession &amp; Systems</div>
+      <div class="note-item jeff"><div class="note-quote">"Start with the customer and work backwards."</div><div class="note-apply">→ A landlord's core pain is unreliable contractors and slow response. Design your B2B pitch around solving THAT — not your platform features. Lead with the outcome.</div></div>
+      <div class="note-item jeff"><div class="note-quote">"We are stubborn on vision, flexible on details."</div><div class="note-apply">→ The vision is clear: premium local trades coordination for South Manchester. But pricing, onboarding flow, channel mix — stay flexible based on what actually converts.</div></div>
+      <div class="note-item jeff"><div class="note-quote">"If you build a great experience, customers tell each other about it."</div><div class="note-apply">→ One letting agency client becomes your best sales tool. Ask them to introduce you to one other agent. That referral loop is worth more than any cold outreach campaign.</div></div>
+      <div class="note-item jeff"><div class="note-quote">"Your margin is my opportunity." (On disrupting incumbents)</div><div class="note-apply">→ Rated People and Checkatrade charge traders 15–20% commissions. Your flat pay-per-lead at £10–30 is structurally cheaper. That IS your B2B competitive angle.</div></div>
+      <div class="note-item jeff"><div class="note-quote">"Invent and simplify."</div><div class="note-apply">→ Keep B2B sales dead simple: one WhatsApp message, one follow-up, one free trial job offered. Complexity kills conversion with time-poor landlords and agents.</div></div>
+    </div>
+  </div>
+
+</div><!-- /strategy -->
+
+<!-- B2B OUTREACH TRACKER -->
+<div class="tab-panel" id="panel-b2b">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);">B2B Outreach Tracker</div>
+      <div style="font-size:12px;color:var(--text-dim);">Landlords · Letting agents · Property managers · 20 min/day</div>
+    </div>
+    <button class="btn btn-danger" onclick="resetB2B()" style="font-size:11px;">↺ Reset All</button>
+  </div>
+
+  <!-- STATS -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="b2b-stats"></div>
+
+  <!-- DAILY TARGETS -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">Today's Targets</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--text-dim);width:170px;flex-shrink:0;">⚡ Messages sent today</span>
+      <div style="flex:1;height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden;"><div style="height:100%;border-radius:3px;background:#60a5fa;transition:width 0.3s;" id="b2b-p-msg"></div></div>
+      <span style="font-size:12px;color:var(--text-dim);min-width:36px;text-align:right;" id="b2b-c-msg">0/5</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--text-dim);width:170px;flex-shrink:0;">🔁 Follow-ups completed</span>
+      <div style="flex:1;height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden;"><div style="height:100%;border-radius:3px;background:var(--accent);transition:width 0.3s;" id="b2b-p-fol"></div></div>
+      <span style="font-size:12px;color:var(--text-dim);min-width:36px;text-align:right;" id="b2b-c-fol">0/3</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:12px;color:var(--text-dim);width:170px;flex-shrink:0;">➕ New contacts added</span>
+      <div style="flex:1;height:6px;background:rgba(0,0,0,0.3);border-radius:3px;overflow:hidden;"><div style="height:100%;border-radius:3px;background:var(--green-light);transition:width 0.3s;" id="b2b-p-new"></div></div>
+      <span style="font-size:12px;color:var(--text-dim);min-width:36px;text-align:right;" id="b2b-c-new">0/3</span>
+    </div>
+  </div>
+
+  <!-- PIPELINE OVERVIEW -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">Pipeline Overview</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;" id="b2b-pipeline"></div>
+  </div>
+
+  <!-- ADD FORM -->
+  <div class="card" style="background:rgba(26,122,60,0.06);border-color:rgba(26,122,60,0.25);margin-bottom:16px;">
+    <div class="card-title">Add Contact</div>
+    <div class="grid-3">
+      <div><label>Name / Business</label><input type="text" id="b-name" placeholder="e.g. Belvoir Didsbury"></div>
+      <div><label>Type</label><select id="b-type"><option>Letting agent</option><option>Landlord</option><option>Property manager</option><option>HMO landlord</option></select></div>
+      <div><label>Area</label><input type="text" id="b-area" placeholder="e.g. Didsbury"></div>
+    </div>
+    <div class="grid-2">
+      <div><label>Channel</label><select id="b-channel"><option>Facebook group</option><option>LinkedIn DM</option><option>Cold email</option><option>WhatsApp</option><option>Networking event</option><option>Trader referral</option></select></div>
+      <div><label>Stage</label><select id="b-stage"><option value="identified">Identified</option><option value="messaged">Messaged</option><option value="replied">Replied</option><option value="call-booked">Call booked</option><option value="trial-agreed">Trial agreed</option><option value="retainer">Retainer signed</option></select></div>
+    </div>
+    <label>Notes</label>
+    <input type="text" id="b-notes" placeholder="e.g. Responded positively, follow up Friday" style="margin-bottom:12px;">
+    <button class="btn btn-primary" onclick="addB2BContact()">+ Add Contact</button>
+  </div>
+
+  <!-- FILTERS -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="b2b-filters">
+    <button class="btn btn-secondary b2b-filter active-filter" onclick="setB2BFilter('all',this)" style="padding:5px 12px;font-size:11px;">All</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('identified',this)" style="padding:5px 12px;font-size:11px;">Identified</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('messaged',this)" style="padding:5px 12px;font-size:11px;">Messaged</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('replied',this)" style="padding:5px 12px;font-size:11px;">Replied</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('call-booked',this)" style="padding:5px 12px;font-size:11px;">Call Booked</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('trial-agreed',this)" style="padding:5px 12px;font-size:11px;">Trial Agreed</button>
+    <button class="btn btn-secondary b2b-filter" onclick="setB2BFilter('retainer',this)" style="padding:5px 12px;font-size:11px; border-color:var(--green);">Retainer 🎯</button>
+  </div>
+
+  <!-- CONTACTS LIST -->
+  <div id="b2b-contacts"></div>
+</div>
+
+
+<!-- LEAD SCOUT -->
+<div class="tab-panel" id="panel-scout">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);">Lead Scout</div>
+      <div style="font-size:12px;color:var(--text-dim);">Facebook groups · Nextdoor · First to reply wins · Naval principle</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-secondary" onclick="startReplyTimer()" id="timer-btn" style="font-size:11px;">⏱ Start Reply Timer</button>
+      <button class="btn btn-secondary" onclick="resetScoutLeads()" style="font-size:11px;">↺ Reset Leads</button>
+    </div>
+  </div>
+
+  <!-- SPEED STAT + TIMER -->
+  <div class="grid-2" style="gap:16px;margin-bottom:20px;">
+    <div class="scout-speed-box">
+      <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Avg reply speed today</div>
+      <div class="reply-timer" id="avg-speed">—</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Target: under 5 minutes</div>
+    </div>
+    <div class="card" style="margin-bottom:0;text-align:center;">
+      <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Reply timer</div>
+      <div class="reply-timer" id="reply-clock">00:00</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+        <button class="btn btn-primary" onclick="startReplyTimer()" style="font-size:11px;padding:6px 14px;">▶ Start</button>
+        <button class="btn btn-secondary" onclick="stopReplyTimer()" style="font-size:11px;padding:6px 14px;">⏹ Stop & Log</button>
+        <button class="btn btn-secondary" onclick="resetReplyTimer()" style="font-size:11px;padding:6px 14px;">↺</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY STATS -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="scout-stats"></div>
+
+  <div class="grid-2" style="gap:20px;align-items:start;">
+
+    <!-- LEFT COL: KEYWORDS + GROUPS -->
+    <div>
+
+      <!-- KEYWORDS -->
+      <div class="card">
+        <div class="card-title">🎯 Target Keywords</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">Add words/phrases to watch for in posts. Use these to scan group feeds manually.</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="kw-input" placeholder="e.g. removal, electrician, plumber..." style="margin-bottom:0;flex:1;" onkeydown="if(event.key==='Enter')addKeyword()">
+          <button class="btn btn-primary" onclick="addKeyword()" style="padding:8px 14px;white-space:nowrap;">+ Add</button>
+        </div>
+        <div id="keywords-container" style="display:flex;flex-wrap:wrap;gap:4px;min-height:32px;"></div>
+        <div class="search-url-tip">
+          💡 <strong>How to use:</strong> Open a Facebook group → press Ctrl+F → paste a keyword → scan new posts for matches. Check your groups once in the morning (10am slot) and once early evening.
+        </div>
+      </div>
+
+      <!-- FACEBOOK GROUPS -->
+      <div class="card">
+        <div class="card-title">📘 Facebook Groups</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="fg-name" placeholder="Group name" style="margin-bottom:0;flex:1;">
+          <input type="text" id="fg-url" placeholder="Facebook URL" style="margin-bottom:0;flex:1;">
+          <button class="btn btn-primary" onclick="addFBGroup()" style="padding:8px 14px;white-space:nowrap;">+ Add</button>
+        </div>
+        <div id="fb-groups-list"></div>
+      </div>
+
+      <!-- NEXTDOOR AREAS -->
+      <div class="card">
+        <div class="card-title">🏘 Nextdoor Areas</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="nd-name" placeholder="Area name e.g. Didsbury" style="margin-bottom:0;flex:1;">
+          <input type="text" id="nd-url" placeholder="Nextdoor URL (optional)" style="margin-bottom:0;flex:1;">
+          <button class="btn btn-primary" onclick="addNDArea()" style="padding:8px 14px;white-space:nowrap;">+ Add</button>
+        </div>
+        <div id="nd-areas-list"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COL: LOG LEAD + LEADS LIST -->
+    <div>
+
+      <!-- LOG LEAD -->
+      <div class="card" style="background:rgba(26,122,60,0.06);border-color:rgba(26,122,60,0.25);">
+        <div class="card-title">⚡ Log a Lead (paste & fire)</div>
+        <div class="grid-2">
+          <div>
+            <label>Source</label>
+            <select id="sl-source" style="margin-bottom:10px;">
+              <option value="fb">Facebook Group</option>
+              <option value="nd">Nextdoor</option>
+              <option value="wa">WhatsApp</option>
+            </select>
+          </div>
+          <div>
+            <label>Poster name</label>
+            <input type="text" id="sl-poster" placeholder="e.g. Sarah M." style="margin-bottom:10px;">
+          </div>
+        </div>
+        <label>Their post / message</label>
+        <textarea id="sl-post" rows="4" placeholder="Paste the post here — e.g. 'Anyone know a good electrician in Didsbury? Need EICR done urgently'" style="margin-bottom:10px;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" onclick="logAndGenerate()" style="flex:1;justify-content:center;">⚡ Generate Reply + Log Lead</button>
+          <button class="btn btn-secondary" onclick="logScoutLead('new')" style="padding:10px 14px;">Log Only</button>
+        </div>
+      </div>
+
+      <!-- AI REPLY OUTPUT -->
+      <div id="scout-reply-panel" style="display:none;">
+        <div class="card" style="background:rgba(26,122,60,0.06);border-color:rgba(26,122,60,0.25);">
+          <div class="card-title">💬 AI Reply — Ready to Send</div>
+          <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;color:var(--text);position:relative;margin-bottom:10px;">
+            <button onclick="copyScoutReply()" style="position:absolute;top:8px;right:8px;background:var(--navy-mid);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--text-dim);cursor:pointer;">Copy</button>
+            <span id="scout-reply-text"></span>
+          </div>
+          <div id="scout-ai-loading" style="display:none;font-size:12px;color:var(--text-dim);">
+            <div class="dot-pulse" style="display:inline-flex;margin-right:8px;"><span></span><span></span><span></span></div>Generating reply...
+          </div>
+          <button class="btn btn-accent" onclick="sendToMainCRM()" style="font-size:11px;">→ Send to CRM</button>
+        </div>
+      </div>
+
+      <!-- LEADS LOG -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">
+          📋 Lead Log
+          <span id="scout-filter-row" style="float:right;display:flex;gap:6px;"></span>
+        </div>
+        <div id="scout-leads-list"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+<div id="toast-container"></div>
+
+<script>
+
+// ── SUPABASE CONFIG ─────────────────────────────────
+const SUPA_URL = 'https://uduldtlxgxhwykbuwksn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkdWxkdGx4Z3hod3lrYnV3a3NuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTgxMzcsImV4cCI6MjA5NzM5NDEzN30.1mliPs8tMjxhvxagmAGZmPukxgYs0PZLqoD23Rd5dP8';
+
+async function supaFetch(table, method='GET', body=null, query='') {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${table}${query}`, {
+    method,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.status === 204 ? null : res.json();
+}
+
+// ── LEADS — Supabase sync ────────────────────────────
+async function getLeadsDB() {
+  try {
+    const data = await supaFetch('leads', 'GET', null, '?order=created_at.desc');
+    return data || [];
+  } catch(e) {
+    console.warn('Supabase offline, using localStorage', e);
+    try { return JSON.parse(localStorage.getItem('smt_leads') || '[]'); } catch { return []; }
+  }
+}
+
+async function saveLeadDB(lead) {
+  try {
+    if (lead.id && lead.id.length === 36) {
+      // Update existing
+      await supaFetch('leads', 'PATCH', lead, `?id=eq.${lead.id}`);
+    } else {
+      // New lead — generate id
+      lead.id = crypto.randomUUID();
+      await supaFetch('leads', 'POST', lead);
+    }
+    // Also keep localStorage as backup
+    const all = JSON.parse(localStorage.getItem('smt_leads') || '[]');
+    const idx = all.findIndex(l => l.id === lead.id);
+    if (idx >= 0) all[idx] = lead; else all.unshift(lead);
+    localStorage.setItem('smt_leads', JSON.stringify(all));
+    return lead;
+  } catch(e) {
+    console.warn('Supabase save failed, localStorage only', e);
+    const all = JSON.parse(localStorage.getItem('smt_leads') || '[]');
+    if (!lead.id) lead.id = Date.now().toString();
+    const idx = all.findIndex(l => l.id === lead.id);
+    if (idx >= 0) all[idx] = lead; else all.unshift(lead);
+    localStorage.setItem('smt_leads', JSON.stringify(all));
+    updateCRMBadge();
+    return lead;
+  }
+}
+
+async function deleteLeadDB(id) {
+  try {
+    await supaFetch('leads', 'DELETE', null, `?id=eq.${id}`);
+  } catch(e) { console.warn('Delete failed on Supabase', e); }
+  const all = JSON.parse(localStorage.getItem('smt_leads') || '[]').filter(l => l.id !== id);
+  localStorage.setItem('smt_leads', JSON.stringify(all));
+  updateCRMBadge();
+}
+
+// ── SYNC STATUS INDICATOR ────────────────────────────
+function showSyncStatus(msg, ok=true) {
+  let el = document.getElementById('sync-status');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-status';
+    el.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;z-index:9999;transition:opacity 0.5s;';
+    document.body.appendChild(el);
+  }
+  el.style.background = ok ? '#1a7a3c' : '#c0392b';
+  el.style.color = '#fff';
+  el.style.opacity = '1';
+  el.textContent = msg;
+  setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+// ── END SUPABASE ─────────────────────────────────────
+
+const WA='447459819603';
+const SHEET_ID='1Tw6AS2vFNNtRO_FT8tlXhoCgJor6B2dCsbx_2U8RyL0';
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(tab==='crm'){
+    getLeadsDB().then(leads => {
+      localStorage.setItem('smt_leads', JSON.stringify(leads));
+      updateCRMBadge();
+      renderLeads();
+      showSyncStatus('✅ CRM synced from cloud');
+    }).catch(() => renderLeads());
+  }
+  if(tab==='pipeline')renderPipeline();
+  if(tab==='strategy'){renderChannels();renderTracker();}
+  if(tab==='posts')renderPosts();
+  if(tab==='b2b')renderB2B();
+  if(tab==='scout')renderScout();
+}
+
+function toast(msg,type='success'){
+  const el=document.createElement('div');el.className='toast';
+  el.style.borderColor=type==='error'?'#e74c3c':'var(--green)';
+  el.textContent=msg;document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(),3200);
+}
+
+let currentLeadData=null;
+async function runAIResponder(){
+  const input=document.getElementById('ai-input').value.trim();
+  const source=document.getElementById('ai-source').value;
+  if(!input){toast('Please paste a lead message first','error');return;}
+  document.getElementById('ai-run-btn').disabled=true;
+  document.getElementById('ai-loading').style.display='block';
+  document.getElementById('ai-output-panel').style.display='none';
+  document.getElementById('ai-placeholder').style.display='none';
+  document.getElementById('add-crm-banner').style.display='none';
+  currentLeadData=null;
+  const sys=`You are the SortMyTrade Lead Response Operator for SortMyTrade.com covering South Manchester & Cheshire. TRADERS: Yellow Removals, House of Dreams (Handyman/Garden/Waste), One Arrow Electrical (NAPIT, Wilmslow/Poynton/Woodford/Bramhall/SK12), Robert (Electrician, Withington), Gardening Specialist, Joe (Man & Van). GAPS: Plumber, Builder, Roofer. Grade A=Hot, B=Warm, C=Cold. Return ONLY raw JSON: {"lead_type":"A","label":"short label","trade":"trade","trader_match":"trader","info_to_collect":["q"],"comment":"note for Zaino","dm":"WA message","closing_move":"next step"}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:`Source: ${source}\nLead: ${input}`}]})});
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'{}';
+    let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){throw new Error('Parse failed');}
+    currentLeadData={...parsed,source,raw_input:input};
+    renderAIOutput(parsed);
+  }catch(err){
+    toast('AI error: '+err.message,'error');
+    document.getElementById('ai-placeholder').style.display='block';
+  }finally{
+    document.getElementById('ai-run-btn').disabled=false;
+    document.getElementById('ai-loading').style.display='none';
+  }
+}
+function renderAIOutput(d){
+  document.getElementById('classification-chips').innerHTML=`<div class="info-chip"><span class="grade-badge grade-${d.lead_type}">${d.lead_type}</span></div><div class="info-chip"><strong>${d.label||'—'}</strong></div><div class="info-chip">Trade: <strong>${d.trade||'—'}</strong></div><div class="info-chip">Trader: <strong>${d.trader_match||'—'}</strong></div>`;
+  let info='';
+  if(d.info_to_collect&&d.info_to_collect.length)info='<div style="margin-top:10px;font-size:11px;color:var(--text-dim);margin-bottom:6px;">Info needed</div>'+d.info_to_collect.map(q=>`<div style="font-size:12px;color:var(--text-dim);padding:3px 0;">• ${q}</div>`).join('');
+  document.getElementById('ai-comment').innerHTML=`<div style="margin-bottom:8px;color:var(--text);">${d.comment||''}</div>${info}`;
+  document.getElementById('dm-text').textContent=d.dm||'';
+  document.getElementById('ai-closing').textContent=d.closing_move||'';
+  document.getElementById('ai-json').textContent=JSON.stringify(d,null,2);
+  document.getElementById('ai-output-panel').style.display='block';
+  document.getElementById('add-crm-banner').style.display='flex';
+}
+function toggleJSON(){const el=document.getElementById('ai-json');el.style.display=el.style.display==='none'?'block':'none';}
+function copyDM(){navigator.clipboard.writeText(document.getElementById('dm-text').textContent).then(()=>toast('DM copied ✓'));}
+
+function getLeads(){
+  // Returns cached localStorage leads (sync fallback)
+  try{return JSON.parse(localStorage.getItem('smt_leads')||'[]');}catch{return[];}
+}
+function saveLeads(l){
+  localStorage.setItem('smt_leads',JSON.stringify(l));
+  updateCRMBadge();
+}
+function updateCRMBadge(){const l=getLeads();const a=l.filter(x=>x.status!=='lost').length;const b=document.getElementById('crm-badge');b.textContent=a;b.classList.toggle('show',a>0);}
+function openGoogleSheet(){window.open('https://docs.google.com/spreadsheets/d/'+SHEET_ID,'_blank');}
+
+function toggleAddForm(pre=null){
+  const form=document.getElementById('crm-add-form');
+  if(form.classList.contains('show')&&!pre){form.classList.remove('show');clearCRMForm();return;}
+  if(pre){
+    document.getElementById('crm-form-title').textContent='✏️ Edit Lead';
+    document.getElementById('crm-edit-id').value=pre.id||'';
+    document.getElementById('crm-name').value=pre.name||'';
+    document.getElementById('crm-phone').value=pre.phone||'';
+    document.getElementById('crm-source-input').value=pre.source||'Facebook DM';
+    document.getElementById('crm-trade').value=pre.trade||'';
+    document.getElementById('crm-trader').value=pre.trader||'Unassigned';
+    document.getElementById('crm-grade').value=pre.grade||'';
+    document.getElementById('crm-details').value=pre.details||'';
+    document.getElementById('crm-status').value=pre.status||'new';
+    document.getElementById('crm-value').value=pre.value||'';
+    document.getElementById('crm-delete-btn').style.display='inline-flex';
+  }else{
+    document.getElementById('crm-form-title').textContent='➕ Add New Lead';
+    document.getElementById('crm-delete-btn').style.display='none';
+    clearCRMForm();
+  }
+  form.classList.add('show');
+  form.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function clearCRMForm(){
+  ['crm-edit-id','crm-name','crm-phone','crm-trade','crm-details','crm-value'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('crm-source-input').value='Facebook DM';
+  document.getElementById('crm-trader').value='Unassigned';
+  document.getElementById('crm-grade').value='';
+  document.getElementById('crm-status').value='new';
+}
+function saveLead(){
+  const editId = document.getElementById('crm-edit-id').value;
+  const lead = {
+    id: editId || null,
+    name: document.getElementById('crm-name').value.trim(),
+    phone: document.getElementById('crm-phone').value.trim(),
+    source: document.getElementById('crm-source-input').value,
+    trade: document.getElementById('crm-trade').value.trim(),
+    trader: document.getElementById('crm-trader').value,
+    grade: document.getElementById('crm-grade').value,
+    status: document.getElementById('crm-status').value,
+    value: parseFloat(document.getElementById('crm-value').value)||0,
+    details: document.getElementById('crm-details').value.trim(),
+    created_at: editId ? undefined : new Date().toISOString()
+  };
+  if(!lead.name){alert('Please enter a name');return;}
+  
+  saveLeadDB(lead).then(() => {
+    showSyncStatus('✅ Lead saved to cloud');
+    getLeadsDB().then(leads => {
+      localStorage.setItem('smt_leads', JSON.stringify(leads));
+      updateCRMBadge();
+      renderLeads();
+    });
+  }).catch(e => {
+    showSyncStatus('⚠️ Saved locally only', false);
+    renderLeads();
+  });
+  
+  document.getElementById('crm-add-form').classList.remove('show');
+  document.getElementById('crm-edit-id').value='';
+  document.getElementById('crm-form-title').textContent='➕ Add New Lead';
+  document.getElementById('crm-delete-btn').style.display='none';
+}
+function editLeadById(id){
+  const lead=getLeads().find(l=>l.id==id);
+  if(lead) toggleAddForm(lead);
+}
+function deleteCurrentLead(){const id=document.getElementById('crm-edit-id').value;if(!id||!confirm('Delete this lead?'))return;saveLeads(getLeads().filter(l=>l.id!==id));toggleAddForm();renderLeads();toast('Deleted');}
+function addToCRM(){
+  if(!currentLeadData)return;
+  switchTab('crm',document.querySelectorAll('.tab-btn')[1]);
+  setTimeout(()=>{
+    renderLeads();
+    document.getElementById('crm-form-title').textContent='➕ Add from AI';
+    document.getElementById('crm-edit-id').value='';
+    document.getElementById('crm-trade').value=currentLeadData.trade||'';
+    document.getElementById('crm-grade').value=currentLeadData.lead_type||'';
+    document.getElementById('crm-source-input').value=currentLeadData.source||'Facebook DM';
+    document.getElementById('crm-details').value=currentLeadData.raw_input||'';
+    const tm=currentLeadData.trader_match||'';
+    const map={'Yellow Removals':'Yellow Removals','House of Dreams':'House of Dreams','One Arrow':'One Arrow Electrical','Robert':'Robert (Electrician)','Gardening':'Gardening Specialist','Joe':'Joe (Man & Van)'};
+    let matched='Unassigned';for(const[k,v]of Object.entries(map)){if(tm.includes(k)){matched=v;break;}}
+    document.getElementById('crm-trader').value=matched;
+    document.getElementById('crm-delete-btn').style.display='none';
+    document.getElementById('crm-add-form').classList.add('show');
+    document.getElementById('crm-add-form').scrollIntoView({behavior:'smooth'});
+  },100);
+}
+function renderLeads(){
+  const leads=getLeads();
+  const fS=document.getElementById('filter-status').value;
+  const fT=document.getElementById('filter-trader').value;
+  const fG=document.getElementById('filter-grade').value;
+  const filtered=leads.filter(l=>{if(fS&&l.status!==fS)return false;if(fT&&l.trader!==fT)return false;if(fG&&l.grade!==fG)return false;return true;});
+  const s={total:leads.length,new:leads.filter(l=>l.status==='new').length,booked:leads.filter(l=>l.status==='booked').length,value:leads.reduce((a,l)=>a+(parseFloat(l.value)||0),0)};
+  document.getElementById('crm-stats').innerHTML=`<div class="stat-chip"><strong>${s.total}</strong>Total</div><div class="stat-chip"><strong>${s.new}</strong>New</div><div class="stat-chip"><strong>${s.booked}</strong>Booked</div><div class="stat-chip"><strong>£${s.value.toFixed(0)}</strong>Pipeline</div>`;
+  const c=document.getElementById('leads-container');
+  if(!filtered.length){c.innerHTML='<div class="empty-state"><div class="icon">📋</div>No leads match filters.</div>';return;}
+  const sc={new:'status-new',contacted:'status-contacted',quoted:'status-quoted',booked:'status-booked',lost:'status-lost'};
+  c.innerHTML='<table class="leads-table"><thead><tr><th>Name</th><th>Trade</th><th>Trader</th><th>Grade</th><th>Status</th><th>Value</th><th>Source</th><th>Date</th><th></th></tr></thead><tbody>'+filtered.map(l=>'<tr><td><strong style="color:var(--white)">'+l.name+'</strong>'+(l.phone?'<br><span style="color:var(--text-dim);font-size:11px;">'+l.phone+'</span>':'')+'</td><td>'+(l.trade||'—')+'</td><td style="font-size:11px;">'+(l.trader||'Unassigned')+'</td><td>'+(l.grade?'<span class="grade-badge grade-'+l.grade+'">'+l.grade+'</span>':'—')+'</td><td><span class="status-badge '+(sc[l.status]||'status-new')+'">'+l.status+'</span></td><td>'+(l.value?'£'+l.value:'—')+'</td><td style="font-size:11px;color:var(--text-dim)">'+(l.source||'—')+'</td><td style="font-size:10px;color:var(--text-dim)">'+(l.created?new Date(l.created).toLocaleDateString('en-GB'):'—')+'</td><td><button class="btn btn-secondary" style="padding:4px 10px;font-size:10px;" onclick="editLeadById('+l.id+')" >Edit</button></td></tr>').join('')+'</tbody></table>';
+  updateCRMBadge();
+}
+function exportCSV(){
+  const leads=getLeads();if(!leads.length){toast('No leads','error');return;}
+  const h=['Name','Phone','Source','Trade','Trader','Grade','Status','Value','Details','Created'];
+  const rows=leads.map(l=>[l.name,l.phone,l.source,l.trade,l.trader,l.grade,l.status,l.value,'"'+(l.details||'').replace(/"/g,'""')+'"',l.created?new Date(l.created).toLocaleDateString('en-GB'):''].join(','));
+  const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='smt-leads.csv';a.click();toast('CSV exported ✓');
+}
+
+function calcMargin(){
+  const job=parseFloat(document.getElementById('calc-job-value').value)||0;
+  const lead=parseFloat(document.getElementById('calc-lead-cost').value)||0;
+  const comm=parseFloat(document.getElementById('calc-commission').value)||0;
+  const labour=parseFloat(document.getElementById('calc-labour').value)||0;
+  const other=parseFloat(document.getElementById('calc-other').value)||0;
+  const ce=job*(comm/100);const st=lead+ce;const tp=job-lead-labour-other;const tm=job>0?(tp/job*100).toFixed(1):0;
+  document.getElementById('r-lead-fee').textContent='£'+lead.toFixed(2);
+  document.getElementById('r-commission').textContent='£'+ce.toFixed(2);
+  document.getElementById('r-smt-total').textContent='£'+st.toFixed(2);
+  document.getElementById('r-job-val').textContent='£'+job.toFixed(2);
+  document.getElementById('r-lead-paid').textContent='-£'+lead.toFixed(2);
+  document.getElementById('r-labour').textContent='-£'+labour.toFixed(2);
+  document.getElementById('r-other').textContent='-£'+other.toFixed(2);
+  document.getElementById('r-trader-profit').textContent='£'+tp.toFixed(2);
+  document.getElementById('r-trader-margin').textContent=tm+'%';
+  calcProjection();
+}
+function calcProjection(){
+  const lead=parseFloat(document.getElementById('calc-lead-cost').value)||0;
+  const lpm=parseFloat(document.getElementById('calc-leads-pm').value)||0;
+  const m=lead*lpm;const g=8000-m;
+  document.getElementById('r-monthly-lead').textContent='£'+m.toFixed(0);
+  document.getElementById('r-gap').textContent=g>0?'£'+g.toFixed(0)+' short':'🎯 Target hit!';
+  document.getElementById('r-gap').style.color=g>0?'var(--accent)':'var(--green-light)';
+}
+
+function renderPipeline(){
+  const leads=getLeads();
+  const stages=['new','contacted','quoted','booked','lost'];
+  const labels={new:'New',contacted:'Contacted',quoted:'Quoted',booked:'Booked ✅',lost:'Lost ❌'};
+  document.getElementById('pipeline-board').innerHTML=stages.map(s=>{
+    const sl=leads.filter(l=>l.status===s);
+    return '<div class="pipeline-col"><div class="pipeline-col-title">'+labels[s]+'<span style="background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:10px;font-size:10px;">'+sl.length+'</span></div>'+(sl.length?sl.map(l=>'<div class="pipeline-card" onclick=\'toggleAddForm('+JSON.stringify(l)+')\' ><div class="pc-name">'+l.name+'</div><div class="pc-trade">'+(l.trade||'—')+' · '+(l.trader||'?')+'</div>'+(l.value?'<div style="color:var(--accent);font-size:11px;margin-top:3px;">£'+l.value+'</div>':'')+'</div>').join(''):'<div style="font-size:11px;color:var(--text-dim);text-align:center;padding:20px 0;">Empty</div>')+'</div>';
+  }).join('');
+}
+
+const posts=[
+  {type:'lead-gen',text:'📦 Still searching for a removal company you can actually trust?\n\nMost people get let down on moving day. We make sure that never happens.\n\nOur vetted removal teams across South Manchester & Cheshire are booked fast — don\'t leave it too late.\n\n✅ Same week availability\n✅ Verified reviews\n✅ Free to enquire\n\nDM us now before your date gets taken 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'⚡ Electrical problem and not sure who to trust?\n\nYou\'re not alone — dodgy electricians are one of the biggest complaints in South Manchester.\n\nEvery electrician on SortMyTrade is NAPIT accredited, insured and reviewed. We\'ve done the vetting so you don\'t have to.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'⭐⭐⭐⭐⭐ \"I\'d been let down twice before finding SortMyTrade. They had a removal team to me within the hour. Unreal service.\"\n\n— Recent customer, Sale\n\nDon\'t risk being let down again. We\'ve got you.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'💡 Warning: Not all electricians are legally qualified to do the work they quote for.\n\nIf something goes wrong with unqualified electrical work — your insurance won\'t cover it.\n\nEvery electrician we work with is NAPIT or NICEIC accredited. Certified, insured, verified.\n\nDon\'t take the risk.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🌿 Your garden is the first thing guests see. Is it letting your home down?\n\nOur local gardening specialists transform outdoor spaces across South Manchester & Cheshire — fast, reliable and fairly priced.\n\nSpots are filling up this month. Get in first 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'🏡 Why SortMyTrade instead of a big national directory?\n\nBecause we actually know our traders personally. We\'ve met them, checked their work and we stand behind every job.\n\nNational directories list anyone. We vouch for everyone.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🔨 Tired of handymen who don\'t show up?\n\nWe hear it every week — booked, then ghosted. It\'s one of the most frustrating things about getting work done at home.\n\nOur handymen in Didsbury, Chorlton and Sale show up. Every time.\n\nBook through us — free to enquire 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'📦 Yellow Removals moved a 4-bed family home last week — done by midday, not a single item damaged.\n\n\"Honestly the most stress-free move we\'ve ever had.\" ⭐⭐⭐⭐⭐\n\nThat\'s what vetted traders look like.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'🏠 Moving house checklist — what most people forget:\n\n✅ Book removals 2+ weeks ahead (last minute = double the price)\n✅ Confirm parking for the van\n✅ Pack room by room — label everything\n✅ Confirm access times with your agent\n\nNeed a reliable removal team? We\'ve got you.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'💧 A small leak ignored becomes a big repair bill.\n\nIf you\'ve noticed dripping, damp or reduced pressure — get it looked at now before it gets worse.\n\nWe have qualified plumbers across South Manchester & Cheshire ready to help.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'📍 We\'re local. We care about our reputation here.\n\nDidsbury · Chorlton · Sale · Altrincham · Wilmslow · Knutsford · Bramhall · Poynton · Woodford\n\nEvery trader we work with knows their reputation is on the line with every job. That\'s how we keep standards high.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🚐 Moving something this week and need a man & van?\n\nDon\'t leave it — availability goes fast especially at weekends.\n\nWe have reliable drivers across South Manchester ready now. Single items, part loads, student moves.\n\nDM us and we\'ll get it booked today 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'\"Called at 9am, electrician was with me by 11am. Fixed within the hour.\" ⭐⭐⭐⭐⭐\n\nThat\'s the SortMyTrade standard. Fast, qualified, local.\n\nWhen you need it done right the first time — you know where we are.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'🔌 Landlords — did you know your EICR can invalidate your insurance if it\'s out of date?\n\nEvery 5 years is the legal requirement. Miss it and your tenants have grounds to withhold rent.\n\nWe coordinate NAPIT-accredited electricians across South Manchester & Cheshire. Bulk bookings available.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🏗 Thinking about a renovation in 2025?\n\nThe longer you wait the busier tradespeople get — and prices go up with demand.\n\nLock in your builder, joiner or roofer now through SortMyTrade before the summer rush.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'👷 We turned down 3 traders last month.\n\nNot because we didn\'t need them — because they didn\'t meet our standard.\n\nEvery trader on SortMyTrade has passed our vetting process. Qualifications, insurance, reviews. No exceptions.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🌱 Your garden won\'t sort itself this spring.\n\nAnd the longer you leave it the more it\'ll cost to put right.\n\nJet washing, lawn care, clearances, landscaping — our specialists are available now across South Manchester & Cheshire.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'🔧 One Arrow Electrical — NAPIT accredited, covering Wilmslow, Bramhall, Poynton and surrounding areas.\n\nThey joined SortMyTrade because they wanted more of the right customers. Customers who value quality over the cheapest quote.\n\nAre you that customer?\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'📦 Why do removal quotes vary so much?\n\n3 reasons:\n1. Some teams cut corners on insurance\n2. Some add hidden charges on the day\n3. Some simply understaff the job\n\nAll SortMyTrade removal teams are vetted, insured and fairly priced. No surprises.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🏘 Landlords in South Manchester —\n\nVoid periods cost you money every single day. Slow contractors make them longer.\n\nSortMyTrade gets your properties turned around faster with reliable local trades. One call. Job sorted.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'💬 Most enquiries matched within the hour.\n\nWe know you can\'t wait days for a callback. Neither can we.\n\nFast response. Vetted traders. South Manchester & Cheshire.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'\"Used SortMyTrade after being let down by two other companies. Should have come here first.\" ⭐⭐⭐⭐⭐\n\nDon\'t waste time being let down. Come to us first.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'💡 3 things every homeowner should check before hiring a tradesperson:\n\n✅ Are they insured? (ask for proof)\n✅ Do they have verifiable reviews?\n✅ Are they accredited where required?\n\nWe\'ve already checked all of this for every trader on SortMyTrade. That\'s the point.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🔌 Power cut? Tripping fuse? Electrical fault?\n\nEvery hour without power costs you more than the repair. Don\'t wait.\n\nLocal NAPIT-accredited electricians available for urgent callouts across Withington, Didsbury and Chorlton.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'trust',text:'🇬🇧 Built in South Manchester. For South Manchester.\n\nWe\'re not a national call centre. We\'re local people who know the area, know the traders and care about the outcome.\n\nThat\'s the difference.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🪣 Rubbish piling up? End of tenancy clearance needed?\n\nEvery day it sits there is a day your property isn\'t ready to rent or sell.\n\nOur licensed waste removal team covers South Manchester — often same week availability.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'social-proof',text:'📲 Another week. More happy customers matched with reliable local traders through SortMyTrade.\n\nSimple. Fast. Free to use.\n\nJoin them today 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'edu',text:'🏠 Selling your home?\n\nEvery £1 spent on presentation before listing typically returns £3 at sale.\n\nPainters, gardeners, handymen — local, vetted, ready now.\n\nDon\'t leave money on the table.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'lead-gen',text:'🌟 Are you a quality tradesperson in South Manchester or Cheshire?\n\nWe only work with the best — and we send them consistent, qualified leads.\n\nNo cold calling. No chasing customers. Just work.\n\nApply to join: sortmytrade.com/traders\n📲 wa.me/447459819603'},
+  {type:'trust',text:'🔒 Your information is safe with us.\n\nWe only share what\'s needed with the matched trader. No spam. No selling your data. No nonsense.\n\nJust fast, trusted local connections.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'🏢 Letting agents — how many hours did your team spend chasing contractors this week?\n\nEvery hour chasing is an hour not spent on lettings.\n\nSortMyTrade takes that off your plate completely. One call. All trades. Vetted and insured.\n\nWe\'re offering South Manchester agencies a free trial job this month — no commitment.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'🏠 Landlords — void periods are your biggest hidden cost.\n\nEvery week a property sits empty costs you £200–500 in lost rent.\n\nSlow contractors make void periods longer. SortMyTrade makes them shorter.\n\nOne call. Vetted trades. Fast turnaround.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'📋 Property managers in Cheshire —\n\nHow much is contractor unreliability actually costing you? Missed appointments. Repeat visits. Unhappy tenants.\n\nSortMyTrade coordinates vetted local trades so the job gets done right the first time.\n\nAsk about our retainer packages 👇\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'⚡ Landlords — EICR out of date means:\n\n❌ Invalid insurance\n❌ Tenants can withhold rent legally\n❌ Council enforcement risk\n\nDon\'t let an expired certificate cost you thousands.\n\nWe coordinate NAPIT-accredited electricians across South Manchester & Cheshire. Bulk bookings available.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'🤝 Letting agents — what if your landlords never had to chase you about maintenance again?\n\nThat\'s what SortMyTrade delivers. We coordinate everything. You get the credit.\n\nFree trial job this month for South Manchester agencies — one job, on us, see the difference.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'📊 The real cost of a slow void turnaround:\n\n• Week 1 of delay: £250 lost rent\n• Week 2: £500 lost rent\n• Tenant complaint: potential legal cost\n• Total avoidable cost: £1,000+\n\nSortMyTrade gets your properties turned around fast with reliable local trades.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'💼 Agent Partner package — £499/month\n\n→ Unlimited trade job referrals\n→ Same-day response guarantee\n→ Dedicated WhatsApp coordination\n→ Monthly spend & job report\n→ Exclusive trader allocation\n\nOne agency told us it paid for itself in the first week.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'🔧 Maintenance emergency at your rental property?\n\nEvery minute counts. Water damage spreads. Tenants get upset. Costs escalate.\n\nAdd SortMyTrade to your contacts now — before you need us.\n\n📲 wa.me/447459819603\n🌐 sortmytrade.com'},
+  {type:'b2b',text:'📌 The best letting agents in South Manchester have one thing in common —\n\nThey never scramble for a contractor.\n\nBe that agent. SortMyTrade gives you a vetted trades network on demand. White-label option available.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+  {type:'b2b',text:'🏗 End of tenancy turnaround costing you sleep?\n\nPainting. Cleaning. Flooring. Minor repairs. Garden tidy.\n\nSortMyTrade coordinates all of it. One call. Multiple trades. One invoice summary.\n\nAsk about our Landlord Pro package — £299/month.\n\n🌐 sortmytrade.com\n📲 wa.me/447459819603'},
+];
+let activeFilter='';
+function filterPosts(t){activeFilter=t;renderPosts();}
+function renderPosts(){
+  const f=activeFilter?posts.filter(p=>p.type===activeFilter):posts;
+  document.getElementById('posts-grid').innerHTML=f.map(p=>{
+    const gi=posts.indexOf(p);
+    return '<div class="post-card"><div class="post-num">Post '+(gi+1)+' of '+posts.length+'</div><span class="post-type '+p.type+'">'+p.type.replace('-',' ')+'</span><button class="post-copy-btn" onclick="copyPost('+gi+')">Copy</button><div class="post-body">'+p.text.replace(/\n/g,'<br>')+'</div></div>';
+  }).join('');
+}
+function copyPost(i){navigator.clipboard.writeText(posts[i].text).then(()=>toast('Post copied ✓'));}
+
+const channels=[
+  {icon:'🏢',name:'Letting Agents — Cold Outreach',sub:'Rightmove-listed agents in target postcodes',diff:'Medium',dc:'diff-medium',desc:'Identify 20 letting agents in Didsbury, Sale, Altrincham, Wilmslow. Find the branch manager on LinkedIn or Google, send a warm DM or email pitching a free trial job.',script:'Hi [Name],\n\nI run SortMyTrade.com — a vetted local trades coordination service covering South Manchester & Cheshire.\n\nI know maintenance coordination is a constant headache for letting agents. We\'re offering 3 local agencies a free trial job this month — we handle everything, you see the quality first-hand.\n\nWould you be open to a quick 10-minute chat this week?\n\nBest,\nZaino',stats:[{l:'Agents in area',v:'40+'},{l:'Avg properties managed',v:'50–200'},{l:'Conversion est.',v:'1 in 8'}]},
+  {icon:'🏠',name:'Landlord Facebook Groups',sub:'South Manchester Landlords, GM Property groups',diff:'Easy',dc:'diff-easy',desc:'Join 5–10 South Manchester landlord Facebook groups. Post value-first content (EICR reminders, checklists), then DM anyone posting about trade problems. Respond to pain — don\'t cold pitch.',script:'Hi [Name],\n\nSaw your post about the contractor letting you down — that\'s a nightmare.\n\nI run SortMyTrade — we coordinate vetted local trades across South Manchester. Electrical, handyman, removals, gardening.\n\nHappy to help sort this one out for you quickly. What\'s the job?\n\n— Zaino (sortmytrade.com)',stats:[{l:'Group size (avg)',v:'2–8k members'},{l:'Daily pain posts',v:'3–5'},{l:'Fastest channel',v:'✓'}]},
+  {icon:'💼',name:'LinkedIn — Property Professionals',sub:'Property managers, HMO landlords, block managers',diff:'Medium',dc:'diff-medium',desc:'Search LinkedIn for "property manager Manchester", "HMO landlord Cheshire", "block manager Altrincham". Send connection requests with a brief note. Follow up 3 days later with the pitch.',script:'Hi [Name], I noticed you manage properties in South Manchester — I run SortMyTrade, a vetted trades coordination service covering the area. We help landlords and letting agents get maintenance jobs handled quickly and reliably. Would love to connect — might save you a headache or two! — Zaino',stats:[{l:'Targeting precision',v:'High'},{l:'Decision maker reach',v:'2nd degree'},{l:'Response rate',v:'8–15%'}]},
+  {icon:'📧',name:'Email Outreach — Agent Offices',sub:'Scrape branch emails from Rightmove/Zoopla listings',diff:'Easy',dc:'diff-easy',desc:'Search Rightmove for "letting agents Didsbury", collect 30–50 branch emails. Send personalised batch emails. Follow up once at day 5.',script:'Subject: Maintenance coordination for [Agency Name] landlords\n\nHi team,\n\nI run SortMyTrade.com — we handle trade coordination (electrical, handyman, removals, gardens) for landlords and letting agencies across South Manchester & Cheshire.\n\nWe\'re offering South Manchester agencies a free trial job this month — no risk, just see the service.\n\nWould [Agency Name] be interested? Happy to jump on a 10-minute call.\n\nBest,\nZaino\nsortmytrade.com | wa.me/447459819603',stats:[{l:'Emails per session',v:'20–30'},{l:'Reply rate',v:'5–10%'},{l:'Time to send',v:'~45 min'}]},
+  {icon:'🤝',name:'Referral Network — Existing Traders',sub:'Activate Yellow Removals, House of Dreams, etc.',diff:'Easy',dc:'diff-easy',desc:'Brief each existing trader: if they work for a landlord or letting agent, mention SortMyTrade as a maintenance coordination option. Warm referrals have the highest close rate of any channel.',script:'Hey [Trader Name],\n\nQuick favour — if any of your customers mention they\'re a landlord or work with a letting agency, can you put in a word for SortMyTrade?\n\nWe\'re building a landlord package and your recommendation would carry a lot of weight.\n\nIn return, you get first refusal on jobs that come through from them.\n\nAppreciate it — Zaino',stats:[{l:'Close rate (referred)',v:'1 in 3'},{l:'Cost',v:'£0'},{l:'Time to set up',v:'30 mins'}]},
+  {icon:'📍',name:'Local Property Networking Events',sub:'NRLA meetups, property investor groups, BNI',diff:'Hard',dc:'diff-hard',desc:'Attend 1 property networking event per month in Manchester — NRLA Greater Manchester chapter, Manchester Property Investor Network. Goal: 3 warm conversations per event, 1 follow-up per week.',script:'"Hi, I\'m Zaino — I run SortMyTrade, we do trade coordination for landlords and letting agencies across South Manchester. If you ever have a maintenance headache — contractor not showing up, last-minute repairs, void turnaround — we handle it. Here\'s my card."\n\n[Follow-up WhatsApp 24hr later:]\n"Great to meet you at [Event] — here\'s the site: sortmytrade.com. Happy to arrange a free trial job if you\'d like to see it in action."',stats:[{l:'Events/month (Mcr)',v:'3–5'},{l:'Avg attendees',v:'30–80'},{l:'Relationship quality',v:'Highest'}]},
+];
+
+function renderChannels(){
+  const g=document.getElementById('channel-grid');
+  if(g.dataset.rendered)return;g.dataset.rendered='1';
+  g.innerHTML=channels.map((ch,i)=>'<div class="channel-card"><div class="channel-header"><div class="channel-icon">'+ch.icon+'</div><div class="channel-meta"><div class="channel-name">'+ch.name+'</div><div class="channel-sub">'+ch.sub+'</div></div><span class="channel-difficulty '+ch.dc+'">'+ch.diff+'</span></div><div class="channel-body"><div class="channel-desc">'+ch.desc+'</div><div class="script-label">Script / Template <button class="script-copy" onclick="copyScript('+i+')">Copy</button></div><div class="script-box">'+ch.script.replace(/\n/g,'<br>')+'</div><div class="channel-stats">'+ch.stats.map(s=>'<div class="ch-stat">'+s.l+': <strong>'+s.v+'</strong></div>').join('')+'</div></div></div>').join('');
+}
+function copyScript(i){navigator.clipboard.writeText(channels[i].script).then(()=>toast('Script copied ✓'));}
+
+const phases=[
+  {label:'Phase 1',lc:'p1',pb:'pb-p1',title:'Foundation',days:'Days 1–30',tasks:['Join 5 South Manchester landlord Facebook groups','Identify 30 letting agents from Rightmove (save to spreadsheet)','Brief all 6 traders on the referral ask','Send first 10 letting agent cold emails','Post 3× per week in landlord groups (value content only)','Attend 1 property networking event','Send 15 LinkedIn connection requests to property managers','Follow up on first email batch (Day 5)','Book 2 discovery calls with interested letting agents','Close first B2B trial job (free)']},
+  {label:'Phase 2',lc:'p2',pb:'pb-p2',title:'Conversion',days:'Days 31–60',tasks:['Convert 1st trial to paid Starter retainer (£149/mo)','Send 20 more cold emails to letting agents','Ask first client for written testimonial','Post testimonial across Facebook + LinkedIn','Pitch 2 landlord group members on Landlord Pro (£299/mo)','Attend 2nd networking event with printed one-pager','Follow up all LinkedIn connections with pitch message','Convert 2nd B2B client to any tier','Add B2B client section to sortmytrade.com','Review and refine outreach scripts based on replies']},
+  {label:'Phase 3',lc:'p3',pb:'pb-p3',title:'Scale',days:'Days 61–90',tasks:['Reach 3 active B2B retainer clients','Pitch 1 letting agency on Agent Partner (£499/mo)','Ask existing B2B clients for referrals to other agents','Create B2B case study (1 client, results, quote)','Launch monthly email newsletter to agent list','Submit sortmytrade.com to local business directories','Review revenue: on track for £8k target?','Systemise: can any outreach be templated further?','Set 90-day targets for Month 4–6','Celebrate first £1k MRR milestone 🥂']},
+];
+function getTrackerState(){try{return JSON.parse(localStorage.getItem('smt_tracker')||'{}');}catch{return{};}}
+function saveTrackerState(s){localStorage.setItem('smt_tracker',JSON.stringify(s));}
+function renderTracker(){
+  const c=document.getElementById('tracker-phases');
+  if(c.dataset.rendered){updateTrackerProgress();return;}
+  c.dataset.rendered='1';
+  const state=getTrackerState();
+  c.innerHTML=phases.map((ph,pi)=>{
+    const done=ph.tasks.filter((_,ti)=>state[pi+'-'+ti]).length;
+    const pct=Math.round((done/ph.tasks.length)*100);
+    return '<div class="tracker-phase"><div class="phase-label '+ph.lc+'">'+ph.label+'</div><div class="phase-title">'+ph.title+'</div><div class="phase-days">'+ph.days+'</div><div class="tracker-progress"><div class="tracker-progress-bar '+ph.pb+'" id="pb-'+pi+'" style="width:'+pct+'%"></div></div><div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;">'+done+' / '+ph.tasks.length+' complete</div>'+ph.tasks.map((task,ti)=>{const d=state[pi+'-'+ti];return '<div class="tracker-task" onclick="toggleTask('+pi+','+ti+')"><div class="task-check'+(d?' done':'')+'" id="chk-'+pi+'-'+ti+'"></div><div class="task-text'+(d?' done':'')+'" id="txt-'+pi+'-'+ti+'">'+task+'</div></div>';}).join('')+'</div>';
+  }).join('');
+}
+function toggleTask(pi,ti){
+  const state=getTrackerState();const k=pi+'-'+ti;state[k]=!state[k];saveTrackerState(state);
+  const chk=document.getElementById('chk-'+pi+'-'+ti);
+  const txt=document.getElementById('txt-'+pi+'-'+ti);
+  if(chk)chk.classList.toggle('done',state[k]);
+  if(txt)txt.classList.toggle('done',state[k]);
+  updateTrackerProgress();
+  if(state[k])toast('Task marked complete ✓');
+}
+function updateTrackerProgress(){
+  const state=getTrackerState();
+  phases.forEach((ph,pi)=>{
+    const done=ph.tasks.filter((_,ti)=>state[pi+'-'+ti]).length;
+    const bar=document.getElementById('pb-'+pi);
+    if(bar)bar.style.width=Math.round((done/ph.tasks.length)*100)+'%';
+  });
+}
+function resetTracker(){if(!confirm('Reset all tracker progress?'))return;localStorage.removeItem('smt_tracker');document.getElementById('tracker-phases').dataset.rendered='';renderTracker();toast('Tracker reset');}
+
+
+const B2B_STAGES=['identified','messaged','replied','call-booked','trial-agreed','retainer'];
+const B2B_LABELS={'identified':'Identified','messaged':'Messaged','replied':'Replied','call-booked':'Call booked','trial-agreed':'Trial agreed','retainer':'Retainer signed'};
+const B2B_TODAY=()=>new Date().toDateString();
+let b2bFilter='all';
+function getB2B(){try{return JSON.parse(localStorage.getItem('smt_b2b')||'[]');}catch{return[];}}
+function saveB2B(d){localStorage.setItem('smt_b2b',JSON.stringify(d));}
+function addB2BContact(){
+  const name=document.getElementById('b-name').value.trim();
+  if(!name){toast('Please enter a name','error');return;}
+  const d=getB2B();
+  const stage=document.getElementById('b-stage').value;
+  d.unshift({id:Date.now(),name,type:document.getElementById('b-type').value,area:document.getElementById('b-area').value,channel:document.getElementById('b-channel').value,stage,notes:document.getElementById('b-notes').value,addedDate:B2B_TODAY(),lastAction:B2B_TODAY(),messaged:stage!=='identified'});
+  saveB2B(d);
+  ['b-name','b-area','b-notes'].forEach(id=>document.getElementById(id).value='');
+  renderB2B();toast('Contact added ✓');
+}
+function advanceB2BStage(id){
+  const d=getB2B();const c=d.find(x=>x.id===id);if(!c)return;
+  const i=B2B_STAGES.indexOf(c.stage);
+  if(i<B2B_STAGES.length-1){c.stage=B2B_STAGES[i+1];c.lastAction=B2B_TODAY();if(c.stage==='messaged')c.messaged=true;saveB2B(d);renderB2B();toast('Moved to: '+B2B_LABELS[c.stage]+' ✓');}
+}
+function deleteB2BContact(id){if(!confirm('Remove this contact?'))return;saveB2B(getB2B().filter(x=>x.id!==id));renderB2B();toast('Removed');}
+function setB2BFilter(f,btn){b2bFilter=f;document.querySelectorAll('.b2b-filter').forEach(b=>b.classList.remove('active-filter'));btn.classList.add('active-filter');renderB2B();}
+function resetB2B(){if(!confirm('Reset all B2B outreach data?'))return;localStorage.removeItem('smt_b2b');renderB2B();toast('B2B tracker reset');}
+function renderB2B(){
+  const d=getB2B();const today=B2B_TODAY();
+  const todayAdded=d.filter(x=>x.addedDate===today).length;
+  const todayMessaged=d.filter(x=>x.messaged&&x.lastAction===today).length;
+  const needsFollowup=d.filter(x=>x.stage==='messaged'&&x.lastAction!==today).length;
+  const retainers=d.filter(x=>x.stage==='retainer').length;
+  document.getElementById('b2b-stats').innerHTML='<div class="b2b-stat-box"><div class="b2b-stat-label">Total contacts</div><div class="b2b-stat-num">'+d.length+'</div></div><div class="b2b-stat-box"><div class="b2b-stat-label">Retainers signed</div><div class="b2b-stat-num green">'+retainers+'</div></div><div class="b2b-stat-box"><div class="b2b-stat-label">Active pipeline</div><div class="b2b-stat-num">'+d.filter(x=>x.stage!=='identified'&&x.stage!=='retainer').length+'</div></div><div class="b2b-stat-box"><div class="b2b-stat-label">Need follow-up</div><div class="b2b-stat-num '+(needsFollowup>0?'amber':'')+'">'+needsFollowup+'</div></div>';
+  const msgPct=Math.min(100,Math.round((todayMessaged/5)*100));
+  const folPct=Math.min(100,Math.round((Math.min(needsFollowup,3)/3)*100));
+  const newPct=Math.min(100,Math.round((todayAdded/3)*100));
+  document.getElementById('b2b-p-msg').style.width=msgPct+'%';
+  document.getElementById('b2b-p-fol').style.width=folPct+'%';
+  document.getElementById('b2b-p-new').style.width=newPct+'%';
+  document.getElementById('b2b-c-msg').textContent=todayMessaged+'/5';
+  document.getElementById('b2b-c-fol').textContent=Math.min(needsFollowup,3)+'/3';
+  document.getElementById('b2b-c-new').textContent=todayAdded+'/3';
+  document.getElementById('b2b-pipeline').innerHTML=B2B_STAGES.map(s=>'<div class="b2b-pipe-box"><div class="b2b-pipe-label">'+B2B_LABELS[s]+'</div><div class="b2b-pipe-num">'+d.filter(x=>x.stage===s).length+'</div></div>').join('');
+  const filtered=b2bFilter==='all'?d:d.filter(x=>x.stage===b2bFilter);
+  const container=document.getElementById('b2b-contacts');
+  if(!filtered.length){container.innerHTML='<div class="empty-state"><div class="icon">📋</div>No contacts yet — add your first prospect above.</div>';return;}
+  container.innerHTML=filtered.map(c=>{
+    const followup=c.stage==='messaged'&&c.lastAction!==today;
+    const cc='b2b-contact-card'+(followup?' needs-followup':'')+(c.stage==='retainer'?' is-retainer':'');
+    return '<div class="'+cc+'"><div><div class="b2b-name">'+c.name+(followup?'<span class="followup-tag">follow up</span>':'')+'</div><div class="b2b-meta">'+c.type+' · '+(c.area||'—')+' · via '+c.channel+'</div>'+(c.notes?'<div class="b2b-notes">'+c.notes+'</div>':'')+'</div><button class="b2b-stage-pill sp-'+c.stage+'" onclick="advanceB2BStage('+c.id+')" title="Click to advance">'+B2B_LABELS[c.stage]+'</button><button class="b2b-del-btn" onclick="deleteB2BContact('+c.id+')" title="Remove">✕</button></div>';
+  }).join('');
+}
+
+
+// ==================== LEAD SCOUT ====================
+let replyTimerInterval=null;
+let replyTimerSeconds=0;
+let replyTimerRunning=false;
+let lastScoutLead=null;
+
+function getScoutData(){
+  return {
+    keywords:JSON.parse(localStorage.getItem('smt_scout_kw')||'[]'),
+    fbGroups:JSON.parse(localStorage.getItem('smt_scout_fb')||'[]'),
+    ndAreas:JSON.parse(localStorage.getItem('smt_scout_nd')||'[]'),
+    leads:JSON.parse(localStorage.getItem('smt_scout_leads')||'[]'),
+    speeds:JSON.parse(localStorage.getItem('smt_scout_speeds')||'[]'),
+  };
+}
+function saveScoutKey(key,val){localStorage.setItem(key,JSON.stringify(val));}
+
+function addKeyword(){
+  const v=document.getElementById('kw-input').value.trim().toLowerCase();
+  if(!v)return;
+  const kws=JSON.parse(localStorage.getItem('smt_scout_kw')||'[]');
+  if(!kws.includes(v)){kws.push(v);saveScoutKey('smt_scout_kw',kws);}
+  document.getElementById('kw-input').value='';
+  renderScout();
+}
+function removeKeyword(kw){
+  const kws=JSON.parse(localStorage.getItem('smt_scout_kw')||'[]').filter(k=>k!==kw);
+  saveScoutKey('smt_scout_kw',kws);renderScout();
+}
+
+function addFBGroup(){
+  const name=document.getElementById('fg-name').value.trim();
+  if(!name){toast('Enter a group name','error');return;}
+  const url=document.getElementById('fg-url').value.trim();
+  const groups=JSON.parse(localStorage.getItem('smt_scout_fb')||'[]');
+  groups.push({id:Date.now(),name,url});
+  saveScoutKey('smt_scout_fb',groups);
+  document.getElementById('fg-name').value='';
+  document.getElementById('fg-url').value='';
+  renderScout();toast('Group added ✓');
+}
+function removeFBGroup(id){
+  const groups=JSON.parse(localStorage.getItem('smt_scout_fb')||'[]').filter(g=>g.id!==id);
+  saveScoutKey('smt_scout_fb',groups);renderScout();
+}
+
+function addNDArea(){
+  const name=document.getElementById('nd-name').value.trim();
+  if(!name){toast('Enter an area name','error');return;}
+  const url=document.getElementById('nd-url').value.trim();
+  const areas=JSON.parse(localStorage.getItem('smt_scout_nd')||'[]');
+  areas.push({id:Date.now(),name,url});
+  saveScoutKey('smt_scout_nd',areas);
+  document.getElementById('nd-name').value='';
+  document.getElementById('nd-url').value='';
+  renderScout();toast('Area added ✓');
+}
+function removeNDArea(id){
+  const areas=JSON.parse(localStorage.getItem('smt_scout_nd')||'[]').filter(a=>a.id!==id);
+  saveScoutKey('smt_scout_nd',areas);renderScout();
+}
+
+function startReplyTimer(){
+  if(replyTimerRunning)return;
+  replyTimerRunning=true;replyTimerSeconds=0;
+  document.getElementById('reply-clock').className='reply-timer';
+  replyTimerInterval=setInterval(()=>{
+    replyTimerSeconds++;
+    const m=Math.floor(replyTimerSeconds/60);
+    const s=replyTimerSeconds%60;
+    const display=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    const el=document.getElementById('reply-clock');
+    el.textContent=display;
+    if(replyTimerSeconds>300)el.className='reply-timer danger';
+    else if(replyTimerSeconds>180)el.className='reply-timer warning';
+    else el.className='reply-timer';
+  },1000);
+}
+function stopReplyTimer(){
+  if(!replyTimerRunning)return;
+  clearInterval(replyTimerInterval);replyTimerRunning=false;
+  const speeds=JSON.parse(localStorage.getItem('smt_scout_speeds')||'[]');
+  speeds.push(replyTimerSeconds);
+  if(speeds.length>20)speeds.shift();
+  saveScoutKey('smt_scout_speeds',speeds);
+  renderScout();
+  toast('Reply time logged: '+Math.floor(replyTimerSeconds/60)+'m '+replyTimerSeconds%60+'s');
+}
+function resetReplyTimer(){
+  clearInterval(replyTimerInterval);replyTimerRunning=false;replyTimerSeconds=0;
+  document.getElementById('reply-clock').textContent='00:00';
+  document.getElementById('reply-clock').className='reply-timer';
+}
+
+function logScoutLead(status){
+  const post=document.getElementById('sl-post').value.trim();
+  const poster=document.getElementById('sl-poster').value.trim();
+  const source=document.getElementById('sl-source').value;
+  if(!post){toast('Paste the post first','error');return;}
+  const leads=JSON.parse(localStorage.getItem('smt_scout_leads')||'[]');
+  const lead={id:Date.now(),post,poster,source,status,date:new Date().toISOString(),reply:''};
+  leads.unshift(lead);
+  saveScoutKey('smt_scout_leads',leads);
+  lastScoutLead=lead;
+  document.getElementById('sl-post').value='';
+  document.getElementById('sl-poster').value='';
+  renderScout();
+  return lead;
+}
+
+async function logAndGenerate(){
+  const post=document.getElementById('sl-post').value.trim();
+  const source=document.getElementById('sl-source').value;
+  if(!post){toast('Paste the post first','error');return;}
+  startReplyTimer();
+  const lead=logScoutLead('new');
+  document.getElementById('scout-reply-panel').style.display='block';
+  document.getElementById('scout-reply-text').textContent='';
+  document.getElementById('scout-ai-loading').style.display='flex';
+
+  const sourceLabel=source==='fb'?'Facebook group':source==='nd'?'Nextdoor':'WhatsApp';
+  const sys=`You are responding on behalf of SortMyTrade.com — a premium local trades coordination service covering South Manchester & Cheshire (Didsbury, Chorlton, Sale, Altrincham, Wilmslow, Knutsford, Bramhall, Poynton, Woodford). Active traders: removals, electricians (NAPIT accredited), handyman, gardening, man & van. Write a SHORT, warm, human reply to this ${sourceLabel} post — 2-4 sentences max. Don't sound like a business, sound like a helpful local person. End with a soft CTA to DM or WhatsApp. Never mention prices. Sign off as Zaino from SortMyTrade. IMPORTANT: Be the first helpful response — fast, friendly, specific to their need.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:[{role:'user',content:'Post: '+post}]})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'';
+    document.getElementById('scout-reply-text').textContent=reply;
+    const leads=JSON.parse(localStorage.getItem('smt_scout_leads')||'[]');
+    const l=leads.find(x=>x.id===lead.id);
+    if(l){l.reply=reply;l.status='replied';saveScoutKey('smt_scout_leads',leads);}
+    stopReplyTimer();
+    renderScout();
+  }catch(err){
+    toast('AI error: '+err.message,'error');
+  }finally{
+    document.getElementById('scout-ai-loading').style.display='none';
+  }
+}
+
+function copyScoutReply(){
+  const t=document.getElementById('scout-reply-text').textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('Reply copied — paste it now! ✓'));
+}
+
+function sendToMainCRM(){
+  const leads=JSON.parse(localStorage.getItem('smt_scout_leads')||'[]');
+  const l=lastScoutLead?leads.find(x=>x.id===lastScoutLead.id):null;
+  if(!l){toast('No lead to send','error');return;}
+  switchTab('crm',document.querySelectorAll('.tab-btn')[1]);
+  setTimeout(()=>{
+    renderLeads();
+    document.getElementById('crm-form-title').textContent='➕ Add from Scout';
+    document.getElementById('crm-edit-id').value='';
+    const srcMap={fb:'Facebook DM',nd:'Nextdoor',wa:'WhatsApp'};
+    document.getElementById('crm-source-input').value=srcMap[l.source]||'Facebook DM';
+    document.getElementById('crm-details').value=l.post;
+    document.getElementById('crm-name').value=l.poster||'';
+    document.getElementById('crm-status').value='contacted';
+    document.getElementById('crm-delete-btn').style.display='none';
+    document.getElementById('crm-add-form').classList.add('show');
+    document.getElementById('crm-add-form').scrollIntoView({behavior:'smooth'});
+    toast('Lead sent to CRM ✓');
+  },150);
+}
+
+function updateScoutLeadStatus(id,status){
+  const leads=JSON.parse(localStorage.getItem('smt_scout_leads')||'[]');
+  const l=leads.find(x=>x.id===id);
+  if(l){l.status=status;saveScoutKey('smt_scout_leads',leads);renderScout();}
+}
+
+function deleteScoutLead(id){
+  if(!confirm('Remove this lead?'))return;
+  saveScoutKey('smt_scout_leads',JSON.parse(localStorage.getItem('smt_scout_leads')||'[]').filter(x=>x.id!==id));
+  renderScout();
+}
+
+function resetScoutLeads(){
+  if(!confirm('Clear all scouted leads?'))return;
+  localStorage.removeItem('smt_scout_leads');
+  localStorage.removeItem('smt_scout_speeds');
+  renderScout();toast('Scout leads reset');
+}
+
+function renderScout(){
+  const data=getScoutData();
+  const leads=data.leads;
+  const today=new Date().toDateString();
+  const todayLeads=leads.filter(l=>new Date(l.date).toDateString()===today);
+  const replied=leads.filter(l=>l.status==='replied'||l.status==='converted');
+  const converted=leads.filter(l=>l.status==='converted');
+
+  // avg speed
+  if(data.speeds.length){
+    const avg=Math.round(data.speeds.reduce((a,b)=>a+b,0)/data.speeds.length);
+    const m=Math.floor(avg/60);const s=avg%60;
+    const el=document.getElementById('avg-speed');
+    el.textContent=m+'m '+s+'s';
+    el.className='reply-timer'+(avg>300?' danger':avg>180?' warning':'');
+  }
+
+  // stats
+  document.getElementById('scout-stats').innerHTML=`
+    <div class="b2b-stat-box"><div class="b2b-stat-label">Leads today</div><div class="b2b-stat-num">${todayLeads.length}</div></div>
+    <div class="b2b-stat-box"><div class="b2b-stat-label">Replied</div><div class="b2b-stat-num" style="color:#60a5fa;">${replied.length}</div></div>
+    <div class="b2b-stat-box"><div class="b2b-stat-label">Converted</div><div class="b2b-stat-num green">${converted.length}</div></div>
+    <div class="b2b-stat-box"><div class="b2b-stat-label">Keywords watching</div><div class="b2b-stat-num">${data.keywords.length}</div></div>
+  `;
+
+  // keywords
+  const kwc=document.getElementById('keywords-container');
+  if(data.keywords.length){
+    kwc.innerHTML=data.keywords.map(kw=>`<span class="scout-keyword-tag">${kw}<button onclick="removeKeyword('${kw}')" title="Remove">✕</button></span>`).join('');
+  } else {
+    kwc.innerHTML='<span style="font-size:12px;color:var(--text-dim);">No keywords yet — add your first above</span>';
+  }
+
+  // fb groups
+  const fbList=document.getElementById('fb-groups-list');
+  if(data.fbGroups.length){
+    fbList.innerHTML=data.fbGroups.map(g=>`
+      <div class="scout-group-card">
+        <div><div class="scout-group-name">${g.name}</div><div class="scout-group-meta">Facebook Group</div></div>
+        <div class="scout-group-actions">
+          ${g.url?`<a href="${g.url}" target="_blank" class="scout-link-btn fb">Open →</a>`:''}
+          <button onclick="removeFBGroup(${g.id})" class="btn btn-secondary" style="padding:5px 10px;font-size:10px;">✕</button>
+        </div>
+      </div>`).join('');
+  } else {
+    fbList.innerHTML='<div style="font-size:12px;color:var(--text-dim);padding:8px 0;">No groups added yet</div>';
+  }
+
+  // nd areas
+  const ndList=document.getElementById('nd-areas-list');
+  if(data.ndAreas.length){
+    ndList.innerHTML=data.ndAreas.map(a=>`
+      <div class="scout-group-card">
+        <div><div class="scout-group-name">${a.name}</div><div class="scout-group-meta">Nextdoor Area</div></div>
+        <div class="scout-group-actions">
+          ${a.url?`<a href="${a.url}" target="_blank" class="scout-link-btn nd">Open →</a>`:'<a href="https://nextdoor.co.uk" target="_blank" class="scout-link-btn nd">Nextdoor →</a>'}
+          <button onclick="removeNDArea(${a.id})" class="btn btn-secondary" style="padding:5px 10px;font-size:10px;">✕</button>
+        </div>
+      </div>`).join('');
+  } else {
+    ndList.innerHTML='<div style="font-size:12px;color:var(--text-dim);padding:8px 0;">No areas added yet</div>';
+  }
+
+  // leads log
+  const srcLabel={fb:'Facebook',nd:'Nextdoor',wa:'WhatsApp'};
+  const srcClass={fb:'sl-fb',nd:'sl-nd',wa:'sl-wa'};
+  const statusMap={new:'sl-s-new',replied:'sl-s-replied',converted:'sl-s-converted',missed:'sl-s-missed'};
+  const statusLabel={new:'New',replied:'Replied',converted:'Converted ✓',missed:'Missed'};
+  const ll=document.getElementById('scout-leads-list');
+  if(!leads.length){
+    ll.innerHTML='<div class="empty-state"><div class="icon">🔍</div>No leads logged yet — paste a post above and fire.</div>';
+    return;
+  }
+  ll.innerHTML=leads.map(l=>`
+    <div class="scout-lead-card sc-${l.status}">
+      <div class="sl-head">
+        <div>
+          <span class="sl-source-badge ${srcClass[l.source]||'sl-fb'}">${srcLabel[l.source]||'Facebook'}</span>
+          ${l.poster?`<span style="font-size:11px;color:var(--text-dim);margin-left:6px;">${l.poster}</span>`:''}
+        </div>
+        <span style="font-size:10px;color:var(--text-dim);">${new Date(l.date).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+      <div class="sl-text">${l.post.length>200?l.post.substring(0,200)+'...':l.post}</div>
+      ${l.reply?`<div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-bottom:8px;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;">"${l.reply.length>120?l.reply.substring(0,120)+'...':l.reply}"</div>`:''}
+      <div class="sl-status-row">
+        <span class="sl-status ${statusMap[l.status]||'sl-s-new'}">${statusLabel[l.status]||'New'}</span>
+        <button class="btn btn-secondary" onclick="updateScoutLeadStatus(${l.id},'replied')" style="padding:3px 8px;font-size:10px;">Replied</button>
+        <button class="btn btn-secondary" onclick="updateScoutLeadStatus(${l.id},'converted')" style="padding:3px 8px;font-size:10px;border-color:var(--green);">Converted</button>
+        <button class="btn btn-secondary" onclick="updateScoutLeadStatus(${l.id},'missed')" style="padding:3px 8px;font-size:10px;">Missed</button>
+        <button class="btn btn-secondary" onclick="deleteScoutLead(${l.id})" style="padding:3px 8px;font-size:10px;margin-left:auto;">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  updateCRMBadge();
+  renderPosts();
+  calcMargin();
+  renderB2B();
+  renderScout();
+});
+</script>
+</body>
+</html>
